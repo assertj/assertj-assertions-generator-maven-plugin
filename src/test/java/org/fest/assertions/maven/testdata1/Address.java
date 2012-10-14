@@ -1,8 +1,5 @@
-package pl.michalostruszka.fest.assertions.maven.testdata;
+package org.fest.assertions.maven.testdata1;
 
-/**
- * Author: michal
- */
 public class Address {
 
   private String street;

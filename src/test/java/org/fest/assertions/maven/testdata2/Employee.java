@@ -1,10 +1,9 @@
-package pl.michalostruszka.fest.assertions.maven.testdata;
+package org.fest.assertions.maven.testdata2;
 
 import java.util.List;
 
-/**
- * Author: michal
- */
+import org.fest.assertions.maven.testdata1.Address;
+
 public class Employee {
 
   private String name;
