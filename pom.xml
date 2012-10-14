@@ -13,6 +13,12 @@
     <version>1.0.15</version>
   </parent>
 
+  <scm>
+    <developerConnection>scm:git:git@github.com:joel-costigliola/maven-fest-assertion-generator-plugin.git</developerConnection>
+    <connection>scm:git:git://github.com/joel-costigliola/maven-fest-assertion-generator-plugin.git</connection>
+    <url>https://joel-costigliola@github.com/joel-costigliola/maven-fest-assertion-generator-plugin.git</url>
+  </scm>
+
   <dependencies>
 
     <!-- fest assertion generator dependency -->
