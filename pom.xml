@@ -3,7 +3,7 @@
   <groupId>org.easytesting</groupId>
   <artifactId>maven-fest-assertion-generator-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <name>Maven plugin for fest assertion generator</name>
 
   <parent>
