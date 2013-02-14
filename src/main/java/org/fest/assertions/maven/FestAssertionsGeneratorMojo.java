@@ -71,7 +71,7 @@ public class FestAssertionsGeneratorMojo extends AbstractMojo {
   }
 
   private void logExecution() {
-    getLog().info("About to generate Fest assertions for classes in following packages : ");
+    getLog().info("About to generate Fest assertions for classes in following packages and subpackages : ");
     for (String pack : packages) {
       getLog().info("- " + pack);
     }
