@@ -8,6 +8,7 @@ public class Employee {
 
   private String name;
   private List<Address> addresses;
+  private boolean active;
 
   public String getName() {
     return name;
@@ -24,4 +25,13 @@ public class Employee {
   public void setAddresses(List<Address> addresses) {
     this.addresses = addresses;
   }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+  
 }
