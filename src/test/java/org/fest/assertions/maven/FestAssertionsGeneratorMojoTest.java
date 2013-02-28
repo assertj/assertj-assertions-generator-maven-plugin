@@ -19,7 +19,7 @@ import org.fest.assertions.maven.testdata2.Employee;
 
 public class FestAssertionsGeneratorMojoTest {
 
-  private static final String TARGET_DIR = "./target/";
+  private static final String TARGET_DIR = "." + File.separator + "target" + File.separator;
 
   private FestAssertionsGeneratorMojo festAssertionsGeneratorMojo;
   private MavenProject mavenProject;
