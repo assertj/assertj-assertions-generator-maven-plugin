@@ -1,4 +1,4 @@
-package org.fest.assertions.maven.testdata1;
+package org.assertj.maven.testdata1;
 
 public class Address {
 

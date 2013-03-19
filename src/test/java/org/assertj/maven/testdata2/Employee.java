@@ -1,8 +1,9 @@
-package org.fest.assertions.maven.testdata2;
+package org.assertj.maven.testdata2;
 
 import java.util.List;
 
-import org.fest.assertions.maven.testdata1.Address;
+import org.assertj.maven.testdata1.Address;
+
 
 public class Employee {
 

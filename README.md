@@ -1,7 +1,7 @@
-Maven plugin for fest-assertion-generator
+Maven plugin for assertj-assertions-generator
 ==
 
-This plugin can generate [Fest assertions](https://github.com/alexruiz/fest-assert-2.x/wiki) for your own classes via maven (it is based on [fest-assertion-generator](https://github.com/joel-costigliola/fest-assertion-generator/wiki)).
+This plugin can generate [AssertJ assertions](https://github.com/joel-costigliola/assertj-core) for your own classes via maven (it is based on [assertj-assertions-generator](https://github.com/joel-costigliola/assertj-assertions-generator)).
 
 Let's say that you have a `Player` class with `name` and `team` attributes, the plugin is able to create a `PlayerAssert` assertions class with `hasName` and `hasTeam` assertions, to write code like :
 
@@ -17,13 +17,13 @@ By default, it generates the assertions source files in `target/generated-test-s
 Configuration
 --
 
-You need to have FEST Assertions as a dependency in `pom.xml` e.g (version 2.x is required)
+You need to have AssertJ Core as a dependency in `pom.xml` :
 
 ```xml
 <dependency>
-    <groupId>org.easytesting</groupId>
-    <artifactId>fest-assert-core</artifactId>
-    <version>2.0M8</version>
+    <groupId>org.assertj</groupId>
+    <artifactId>assertj-core</artifactId>
+    <version>1.0.0M1</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -32,9 +32,9 @@ To generate custom assertions, add the following plugin to your `pom.xml` build/
 
 ```xml
 <plugin>
-    <groupId>org.easytesting</groupId>
-    <artifactId>maven-fest-assertion-generator-plugin</artifactId>
-    <version>1.0</version>
+    <groupId>org.assertj</groupId>
+    <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
+    <version>1.0.0</version>
     <executions>
         <execution>
             <goals>

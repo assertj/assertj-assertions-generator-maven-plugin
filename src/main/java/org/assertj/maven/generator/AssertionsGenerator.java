@@ -1,16 +1,16 @@
-package org.fest.assertions.maven.generator;
+package org.assertj.maven.generator;
 
-import static org.fest.assertions.generator.util.ClassUtil.collectClasses;
+import static org.assertj.assertions.generator.util.ClassUtil.collectClasses;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.fest.assertions.generator.BaseAssertionGenerator;
-import org.fest.assertions.generator.description.ClassDescription;
-import org.fest.assertions.generator.description.converter.ClassToClassDescriptionConverter;
+import org.assertj.assertions.generator.BaseAssertionGenerator;
+import org.assertj.assertions.generator.description.ClassDescription;
+import org.assertj.assertions.generator.description.converter.ClassToClassDescriptionConverter;
 
 /**
- * Is able to generate Fest assertions classes from packages.
+ * Is able to generate AssertJ assertions classes from packages.
  */
 public class AssertionsGenerator {
 

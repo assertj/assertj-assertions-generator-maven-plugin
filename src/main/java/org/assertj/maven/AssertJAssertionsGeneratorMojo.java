@@ -1,4 +1,4 @@
-package org.fest.assertions.maven;
+package org.assertj.maven;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -23,17 +23,17 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.assertj.maven.generator.AssertionsGenerator;
 
-import org.fest.assertions.maven.generator.AssertionsGenerator;
 
 /**
- * Generates custom FEST assertions files for provided packages
+ * Generates custom AssertJ assertions files for provided packages
  * 
  * @goal generate-assertions
  * @phase generate-test-sources
  * @requiresDependencyResolution compile+runtime
  */
-public class FestAssertionsGeneratorMojo extends AbstractMojo {
+public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   /**
    * Current maven project
@@ -46,10 +46,10 @@ public class FestAssertionsGeneratorMojo extends AbstractMojo {
 
   /**
    * Destination dir to store generated assertion source files. Defaults to
-   * 'target/generated-test-sources/fest-assertions'.<br>
+   * 'target/generated-test-sources/assertj-assertions'.<br>
    * Your IDE should be able to pick up files from this location as sources automatically when generated.
    * 
-   * @parameter default-value="${project.build.directory}/generated-test-sources/fest-assertions"
+   * @parameter default-value="${project.build.directory}/generated-test-sources/assertj-assertions"
    */
   public String targetDir;
 
@@ -71,12 +71,12 @@ public class FestAssertionsGeneratorMojo extends AbstractMojo {
   }
 
   private void logExecution() {
-    getLog().info("About to generate Fest assertions for classes in following packages and subpackages : ");
+    getLog().info("About to generate AssertJ assertions for classes in following packages and subpackages : ");
     for (String pack : packages) {
       getLog().info("- " + pack);
     }
     getLog().info(" ");
-    getLog().info("Fest assertions classes have been generated in : " + targetDir);
+    getLog().info("AssertJ assertions classes have been generated in : " + targetDir);
   }
 
   private AssertionsGenerator newAssertionGenerator() throws Exception {

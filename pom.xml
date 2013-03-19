@@ -1,22 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.easytesting</groupId>
-  <artifactId>maven-fest-assertion-generator-plugin</artifactId>
+  <groupId>org.assertj</groupId>
+  <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.1-SNAPSHOT</version>
-  <name>Maven plugin for fest assertion generator</name>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>Maven plugin for AssertJ assertions generator</name>
 
   <parent>
-    <groupId>org.easytesting</groupId>
-    <artifactId>fest</artifactId>
-    <version>1.0.15</version>
+    <groupId>org.assertj</groupId>
+    <artifactId>assertj-parent-pom</artifactId>
+    <version>1.0.0</version>
   </parent>
 
   <scm>
-    <developerConnection>scm:git:git@github.com:joel-costigliola/maven-fest-assertion-generator-plugin.git</developerConnection>
-    <connection>scm:git:git://github.com/joel-costigliola/maven-fest-assertion-generator-plugin.git</connection>
-    <url>https://joel-costigliola@github.com/joel-costigliola/maven-fest-assertion-generator-plugin.git</url>
+    <developerConnection>scm:git:git@github.com:joel-costigliola/assertj-assertions-generator-maven-plugin.git</developerConnection>
+    <connection>scm:git:git://github.com/joel-costigliola/assertj-assertions-generator-maven-plugin.git</connection>
+    <url>https://joel-costigliola@github.com/joel-costigliola/assertj-assertions-generator-maven-plugin.git</url>
   </scm>
 
   <build>
@@ -25,7 +25,7 @@
         <artifactId>maven-plugin-plugin</artifactId>
         <version>3.2</version>
         <configuration>
-          <goalPrefix>fest</goalPrefix>
+          <goalPrefix>assertj</goalPrefix>
         </configuration>
       </plugin>
     </plugins>
@@ -33,11 +33,16 @@
 
   <dependencies>
 
-    <!-- fest assertion generator dependency -->
+    <!-- assertj dependencies -->
     <dependency>
-      <groupId>org.easytesting</groupId>
-      <artifactId>fest-assertion-generator</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-assertions-generator</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>1.0.0M1-SNAPSHOT</version>
     </dependency>
 
     <!-- maven plugin dependencies -->
@@ -56,19 +61,11 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <version>1.9.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easytesting</groupId>
-      <artifactId>fest-assert-core</artifactId>
-      <version>2.0M10</version>
       <scope>test</scope>
     </dependency>
 
