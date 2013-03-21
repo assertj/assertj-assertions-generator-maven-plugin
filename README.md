@@ -14,6 +14,11 @@ By default, it generates the assertions source files in `target/generated-test-s
 
 **Big thanks** to [Michal Ostruszka](https://github.com/mostr) for its major contribution on this plugin.
 
+Releases
+--
+
+The first release 1.0.0 will be available at the end of March.
+
 Configuration
 --
 
