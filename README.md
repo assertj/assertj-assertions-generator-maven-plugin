@@ -17,12 +17,12 @@ By default, it generates the assertions source files in `target/generated-test-s
 Releases
 --
 
-The first release 1.0.0 will be available at the end of March.
+**2013-03-26 : 1.0.0 release : the first release after Fest fork, generated assertions are cleaner.**
 
 Configuration
 --
 
-You need to have AssertJ Core as a dependency in `pom.xml` :
+You need to have AssertJ Core as a dependency in your `pom.xml` :
 
 ```xml
 <dependency>
@@ -33,12 +33,7 @@ You need to have AssertJ Core as a dependency in `pom.xml` :
 </dependency>
 ```
 
-To generate custom assertions, add the following plugin to your `pom.xml` build/plugins section and execute the command :
-```
-mvn assertj:generate-assertions
-```
-
-xml snippet to add to your pom :
+To generate custom assertions, add the following plugin to your `pom.xml` build/plugins section :
 
 ```xml
 <plugin>
@@ -53,6 +48,11 @@ xml snippet to add to your pom :
         </packages>
     </configuration>
 </plugin>
+```
+
+... and execute the command :
+```
+mvn assertj:generate-assertions
 ```
 
 `packages` configuration element is required so that the plugin knows where to find classes you want to generate assertions for.
