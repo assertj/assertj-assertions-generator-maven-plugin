@@ -44,7 +44,6 @@ To generate custom assertions, add the following plugin to your `pom.xml` build/
         <packages>
             <param>your.first.package</param>
             <param>your.second.package</param>
-            ...
         </packages>
     </configuration>
 </plugin>
@@ -64,9 +63,9 @@ You can also specify non-standard destination directory for assertion files usin
     <packages>
         <param>your.first.package</param>
         <param>your.second.package</param>
-        ...
     </packages>
-    <targetDir>YOUR_NON_STANDARD_DIR</targetDir>
+    <!-- YOUR_NON_STANDARD_DIR -->
+    <targetDir>src/test/java</targetDir>
 </configuration>
 ```
 
@@ -88,7 +87,6 @@ To generate assertions classes at every build, add an `<executions>` section as 
         <packages>
             <param>your.first.package</param>
             <param>your.second.package</param>
-            ...
         </packages>
     </configuration>
 </plugin>
