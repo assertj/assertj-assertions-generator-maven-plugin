@@ -13,6 +13,9 @@ package org.assertj.maven;
  * specific language governing permissions and limitations under the License.
  */
 
+import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
+import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,42 +25,41 @@ import java.util.List;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.assertj.maven.generator.AssertionsGenerator;
 
 
 /**
  * Generates custom AssertJ assertions files for provided packages
- * 
- * @goal generate-assertions
- * @phase generate-test-sources
- * @requiresDependencyResolution compile+runtime
  */
+@Mojo(name = "generate-assertions",
+      defaultPhase = GENERATE_TEST_SOURCES,
+      requiresDependencyResolution = COMPILE_PLUS_RUNTIME,
+      requiresProject = true)
 public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   /**
    * Current maven project
-   * 
-   * @parameter expression="${project}"
-   * @required
-   * @readonly
    */
+  @Parameter(property = "project",
+             required = true,
+             readonly = true)
   public MavenProject project;
 
   /**
    * Destination dir to store generated assertion source files. Defaults to
    * 'target/generated-test-sources/assertj-assertions'.<br>
    * Your IDE should be able to pick up files from this location as sources automatically when generated.
-   * 
-   * @parameter default-value="${project.build.directory}/generated-test-sources/assertj-assertions"
    */
+  @Parameter(defaultValue = "${project.build.directory}/generated-test-sources/assertj-assertions")
   public String targetDir;
 
   /**
    * List of packages to generate assertions for. Currently only packages are supported.
-   * 
-   * @parameter
    */
+  @Parameter
   public String[] packages;
 
   public void execute() throws MojoExecutionException {
