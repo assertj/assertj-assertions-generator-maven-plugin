@@ -68,7 +68,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
       logExecution();
       project.addTestCompileSourceRoot(targetDir);
     } catch (Exception e) {
-      throw new MojoExecutionException(e.getMessage());
+      throw new MojoExecutionException(e.getMessage(), e);
     }
   }
 
