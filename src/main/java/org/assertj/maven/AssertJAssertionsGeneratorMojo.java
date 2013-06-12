@@ -59,7 +59,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   /**
    * List of packages to generate assertions for. Currently only packages are supported.
    */
-  @Parameter
+  @Parameter(property = "assertj.packages")
   public String[] packages;
 
   public void execute() throws MojoExecutionException {

@@ -56,6 +56,11 @@ mvn assertj:generate-assertions
 
 `packages` configuration element is required so that the plugin knows where to find classes you want to generate assertions for.
 
+One who don't want to declare packages in its `pom.xml` can use property `assertj.packages`:  
+```
+mvn assertj:generate-assertions -Dassertj.packages=your.first.package,your.second.package
+```
+
 You can also specify non-standard destination directory for assertion files using `targetDir` configuration element e.g.
 
 ```xml
