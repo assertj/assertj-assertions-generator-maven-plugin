@@ -55,7 +55,8 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
    * 'target/generated-test-sources/assertj-assertions'.<br>
    * Your IDE should be able to pick up files from this location as sources automatically when generated.
    */
-  @Parameter(defaultValue = "${project.build.directory}/generated-test-sources/assertj-assertions")
+  @Parameter(defaultValue = "${project.build.directory}/generated-test-sources/assertj-assertions",
+             property = "assertj.targetDir")
   public String targetDir;
 
   /**
