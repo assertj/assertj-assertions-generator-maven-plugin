@@ -13,6 +13,7 @@ package org.assertj.maven;
  * specific language governing permissions and limitations under the License.
  */
 
+import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
 
@@ -22,6 +23,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -57,14 +59,20 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public String targetDir;
 
   /**
-   * List of packages to generate assertions for. Currently only packages are supported.
+   * List of packages to generate assertions for.
    */
   @Parameter(property = "assertj.packages")
   public String[] packages;
 
+  /**
+   * List of classes to generate assertions for.
+  */
+  @Parameter(property = "assertj.classes")
+  public String[] classes;
+
   public void execute() throws MojoExecutionException {
     try {
-      newAssertionGenerator().generateAssertionSources(packages, targetDir);
+      newAssertionGenerator().generateAssertionSources(ArrayUtils.addAll(packages, classes), targetDir);
       logExecution();
       project.addTestCompileSourceRoot(targetDir);
     } catch (Exception e) {
@@ -73,13 +81,27 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   }
 
   private void logExecution() {
-    getLog().info("About to generate AssertJ assertions for classes in following packages and subpackages : ");
-    for (String pack : packages) {
-      getLog().info("- " + pack);
+    if (isNotEmpty(packages)) {
+      getLog().info("About to generate AssertJ assertions for classes in following packages and subpackages : ");
+      for (String pack : packages) {
+        getLog().info(element(pack));
+      }
+
     }
+    if (isNotEmpty(classes)) {
+      getLog().info("About to generate AssertJ assertions for classes : ");
+      for (String clazz : classes) {
+        getLog().info(element(clazz));
+      }
+    }
+
     getLog().info(" ");
     getLog().info("AssertJ assertions classes have been generated in : " + targetDir);
   }
+
+    private static String element(String pack) {
+        return "- " + pack;
+    }
 
   private AssertionsGenerator newAssertionGenerator() throws Exception {
     return new AssertionsGenerator(getProjectClassLoader());

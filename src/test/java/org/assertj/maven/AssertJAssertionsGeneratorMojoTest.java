@@ -32,8 +32,8 @@ public class AssertJAssertionsGeneratorMojoTest {
     mavenProject = mock(MavenProject.class);
     assertjAssertionsGeneratorMojo = new AssertJAssertionsGeneratorMojo();
     assertjAssertionsGeneratorMojo.project = mavenProject;
-    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.testdata1",
-        "org.assertj.maven.testdata2");
+    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.testdata1");
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.testdata2.Employee");
     assertjAssertionsGeneratorMojo.targetDir = temporaryFolder.getRoot().getAbsolutePath();
   }
 

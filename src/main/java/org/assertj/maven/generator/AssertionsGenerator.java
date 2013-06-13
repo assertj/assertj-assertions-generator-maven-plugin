@@ -24,9 +24,9 @@ public class AssertionsGenerator {
     this.classLoader = classLoader;
   }
 
-  public void generateAssertionSources(String[] packages, String destDir) throws Exception {
+  public void generateAssertionSources(String[] packagesOrClasses, String destDir) throws Exception {
     generator.setDirectoryWhereAssertionFilesAreGenerated(destDir);
-    for (Class<?> clazz : collectClasses(classLoader, packages)) {
+    for (Class<?> clazz : collectClasses(classLoader, packagesOrClasses)) {
       ClassDescription description = converter.convertToClassDescription(clazz);
       generator.generateCustomAssertionFor(description);
     }
