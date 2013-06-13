@@ -1,24 +1,28 @@
 package org.assertj.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.util.Lists.newArrayList;
 import static org.assertj.core.util.Arrays.array;
+import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.project.MavenProject;
 import org.assertj.maven.testdata1.Address;
 import org.assertj.maven.testdata2.Employee;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 
 public class AssertJAssertionsGeneratorMojoTest {
 
-  private static final String TARGET_DIR = "." + File.separator + "target" + File.separator;
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private AssertJAssertionsGeneratorMojo assertjAssertionsGeneratorMojo;
   private MavenProject mavenProject;
@@ -30,7 +34,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.project = mavenProject;
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.testdata1",
         "org.assertj.maven.testdata2");
-    assertjAssertionsGeneratorMojo.targetDir = TARGET_DIR;
+    assertjAssertionsGeneratorMojo.targetDir = temporaryFolder.getRoot().getAbsolutePath();
   }
 
   @Test
@@ -45,9 +49,8 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(assertionsFileFor(Address.class)).exists();
   }
 
-  private static File assertionsFileFor(Class<?> clazz) {
-    return new File(TARGET_DIR + clazz.getPackage().getName().replace('.', File.separatorChar) + File.separator
+  private File assertionsFileFor(Class<?> clazz) throws IOException {
+    return temporaryFolder.newFile(clazz.getPackage().getName().replace('.', File.separatorChar) + File.separator
         + clazz.getSimpleName() + "Assert.java");
   }
-
 }
