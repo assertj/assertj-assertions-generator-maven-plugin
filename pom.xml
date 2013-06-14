@@ -35,12 +35,23 @@
               <goal>descriptor</goal>
             </goals>
         </execution>
+        <execution>
+            <id>help-goal</id>
+            <goals>
+              <goal>helpmojo</goal>
+            </goals>
+        </execution>
       </executions>
       </plugin>
       <!-- generate jacoco report -->
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+              <exclude>org/assertj/maven/HelpMojo.class</exclude>
+          </excludes>
+        </configuration>
       </plugin>
       <!-- to get jacoco report we need to set argLine in surefire, without this snippet the jacoco argLine is lost -->
       <plugin>
