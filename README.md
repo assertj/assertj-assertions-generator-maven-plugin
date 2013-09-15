@@ -17,6 +17,8 @@ By default, it generates the assertions source files in `target/generated-test-s
 Releases
 --
 
+**2013-09-15 : 1.1.0 release : Uses assertj-assertions-generator [1.1.0](https://github.com/joel-costigliola/assertj-assertions-generator#latest-news) version.**
+
 **2013-03-26 : 1.0.0 release : the first release after Fest fork, generated assertions are cleaner.**
 
 Configuration
@@ -28,7 +30,7 @@ You need to have AssertJ Core as a dependency in your `pom.xml` :
 <dependency>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.4.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -39,7 +41,7 @@ To generate custom assertions, add the following plugin to your `pom.xml` build/
 <plugin>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <configuration>
         <packages>
             <param>your.first.package</param>
