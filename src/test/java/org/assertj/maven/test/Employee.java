@@ -1,8 +1,8 @@
-package org.assertj.maven.testdata2;
+package org.assertj.maven.test;
 
 import java.util.List;
 
-import org.assertj.maven.testdata1.Address;
+import org.assertj.maven.test2.adress.Address;
 
 
 public class Employee {

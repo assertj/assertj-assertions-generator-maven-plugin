@@ -4,6 +4,8 @@ import static org.assertj.assertions.generator.util.ClassUtil.collectClasses;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.assertj.assertions.generator.BaseAssertionGenerator;
 import org.assertj.assertions.generator.description.ClassDescription;
@@ -24,12 +26,25 @@ public class AssertionsGenerator {
     this.classLoader = classLoader;
   }
 
-  public void generateAssertionSources(String[] packages, String destDir) throws Exception {
+  /**
+   * Generates custom assertions for classes in given packages with the Assertions class entry point in given
+   * destination dir.
+   * <p>
+   * It returns the Assertions entry point file path.
+   * 
+   * @param packages the packages containing the classes we want to generate Assert classes for.
+   * @param destDir the base directory where the classes are going to be generated.
+   * @return the Assertions entry point file path
+   * @throws Exception
+   */
+  public String generateAssertionSources(String[] packages, String destDir) throws Exception {
     generator.setDirectoryWhereAssertionFilesAreGenerated(destDir);
+    Set<ClassDescription> classDescriptions = new HashSet<ClassDescription>();
     for (Class<?> clazz : collectClasses(classLoader, packages)) {
-      ClassDescription description = converter.convertToClassDescription(clazz);
-      generator.generateCustomAssertionFor(description);
+      ClassDescription classDescription = converter.convertToClassDescription(clazz);
+      generator.generateCustomAssertionFor(classDescription);
+      classDescriptions.add(classDescription);
     }
-
+    return generator.generateAssertionsEntryPointFor(classDescriptions).getPath();
   }
 }

@@ -23,6 +23,7 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+
 import org.assertj.maven.generator.AssertionsGenerator;
 
 
@@ -62,21 +63,26 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   public void execute() throws MojoExecutionException {
     try {
-      newAssertionGenerator().generateAssertionSources(packages, targetDir);
-      logExecution();
+      logExecutionStart();
+      String assertionsEntryPointPathname = newAssertionGenerator().generateAssertionSources(packages, targetDir);
+      logExecutionEnd(assertionsEntryPointPathname);
       project.addTestCompileSourceRoot(targetDir);
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage());
     }
   }
 
-  private void logExecution() {
+  private void logExecutionStart() {
     getLog().info("About to generate AssertJ assertions for classes in following packages and subpackages : ");
     for (String pack : packages) {
       getLog().info("- " + pack);
     }
+  }
+  
+  private void logExecutionEnd(String assertionsEntryPointPathname) {
     getLog().info(" ");
-    getLog().info("AssertJ assertions classes have been generated in : " + targetDir);
+    getLog().info("AssertJ assertions classes have been generated in: " + targetDir);
+    getLog().info("Custom assertions entry point class has been generated in: " + assertionsEntryPointPathname);
   }
 
   private AssertionsGenerator newAssertionGenerator() throws Exception {

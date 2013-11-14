@@ -1,4 +1,4 @@
-package org.assertj.maven.testdata1;
+package org.assertj.maven.test2.adress;
 
 public class Address {
 
