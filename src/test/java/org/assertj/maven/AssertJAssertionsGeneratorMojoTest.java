@@ -1,25 +1,31 @@
 package org.assertj.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.assertj.core.util.Arrays.array;
 import static org.assertj.core.util.Lists.newArrayList;
-
+import static org.assertj.maven.AssertJAssertionsGeneratorMojo.shouldHaveNonEmptyPackagesOrClasses;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import org.assertj.maven.test.Employee;
 import org.assertj.maven.test2.adress.Address;
 
 public class AssertJAssertionsGeneratorMojoTest {
 
-  private static final String TARGET_DIR = "." + File.separator + "target" + File.separator;
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private AssertJAssertionsGeneratorMojo assertjAssertionsGeneratorMojo;
   private MavenProject mavenProject;
@@ -29,12 +35,13 @@ public class AssertJAssertionsGeneratorMojoTest {
     mavenProject = mock(MavenProject.class);
     assertjAssertionsGeneratorMojo = new AssertJAssertionsGeneratorMojo();
     assertjAssertionsGeneratorMojo.project = mavenProject;
-    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test", "org.assertj.maven.test2");
-    assertjAssertionsGeneratorMojo.targetDir = TARGET_DIR;
+    assertjAssertionsGeneratorMojo.targetDir = temporaryFolder.getRoot().getAbsolutePath();
   }
 
   @Test
   public void testExecute() throws Exception {
+    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test", "org.assertj.maven.test2");
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
     when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
 
@@ -46,19 +53,26 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(assertionsEntryPointFile()).exists();
   }
 
-  private static File assertionsFileFor(Class<?> clazz) {
-    return new File(basePathName(clazz) + "Assert.java");
+
+  @Test
+  public void should_fail_if_packages_and_classes_parameters_are_null() throws Exception {
+    try {
+      assertjAssertionsGeneratorMojo.execute();
+      failBecauseExceptionWasNotThrown(MojoFailureException.class);
+    } catch (MojoFailureException e) {
+      assertThat(e).hasMessage(shouldHaveNonEmptyPackagesOrClasses());
+    }
+  }
+    
+  private File assertionsFileFor(Class<?> clazz) throws IOException {
+    return temporaryFolder.newFile(basePathName(clazz) + "Assert.java");
   }
 
   private static String basePathName(Class<?> clazz) {
-    String basePathname = TARGET_DIR + clazz.getPackage().getName().replace('.', File.separatorChar) + File.separator
-        + clazz.getSimpleName();
-    return basePathname;
+    return clazz.getPackage().getName().replace('.', File.separatorChar) + File.separator + clazz.getSimpleName();
   }
 
-  private static File assertionsEntryPointFile() {
-    return new File(TARGET_DIR + "org.assertj.maven.test".replace('.', File.separatorChar) + File.separator
-        + "Assertions.java");
+  private File assertionsEntryPointFile() throws IOException {
+    return temporaryFolder.newFile("org.assertj.maven.test".replace('.', File.separatorChar) + File.separator + "Assertions.java");
   }
-
 }

@@ -47,6 +47,9 @@ To generate custom assertions, add the following plugin to your `pom.xml` build/
             <param>your.first.package</param>
             <param>your.second.package</param>
         </packages>
+        <classes>
+            <param>your.third.package.YourClass</param>
+        </classes>
     </configuration>
 </plugin>
 ```
@@ -56,7 +59,12 @@ To generate custom assertions, add the following plugin to your `pom.xml` build/
 mvn assertj:generate-assertions
 ```
 
-`packages` configuration element is required so that the plugin knows where to find classes you want to generate assertions for.
+`packages` and `classes` configuration elements indicate where to find classes you want to generate assertions for.
+
+One who don't want to declare packages / classes in its `pom.xml` can use properties `assertj.packages` and `assertj.classes`:  
+```
+mvn assertj:generate-assertions -Dassertj.packages=your.first.package,your.second.package
+```
 
 You can also specify non-standard destination directory for assertion files using `targetDir` configuration element e.g.
 

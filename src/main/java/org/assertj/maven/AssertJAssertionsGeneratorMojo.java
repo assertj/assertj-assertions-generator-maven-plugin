@@ -13,6 +13,12 @@ package org.assertj.maven;
  * specific language governing permissions and limitations under the License.
  */
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
+import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
+import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,67 +28,94 @@ import java.util.List;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import org.assertj.core.util.VisibleForTesting;
 import org.assertj.maven.generator.AssertionsGenerator;
-
 
 /**
  * Generates custom AssertJ assertions files for provided packages
- * 
- * @goal generate-assertions
- * @phase generate-test-sources
- * @requiresDependencyResolution compile+runtime
  */
+@Mojo(name = "generate-assertions",
+    defaultPhase = GENERATE_TEST_SOURCES,
+    requiresDependencyResolution = COMPILE_PLUS_RUNTIME,
+    requiresProject = true)
 public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   /**
    * Current maven project
-   * 
-   * @parameter expression="${project}"
-   * @required
-   * @readonly
    */
+  @Parameter(property = "project",
+      required = true,
+      readonly = true)
   public MavenProject project;
 
   /**
    * Destination dir to store generated assertion source files. Defaults to
    * 'target/generated-test-sources/assertj-assertions'.<br>
    * Your IDE should be able to pick up files from this location as sources automatically when generated.
-   * 
-   * @parameter default-value="${project.build.directory}/generated-test-sources/assertj-assertions"
    */
+  @Parameter(defaultValue = "${project.build.directory}/generated-test-sources/assertj-assertions",
+      property = "assertj.targetDir")
   public String targetDir;
 
   /**
-   * List of packages to generate assertions for. Currently only packages are supported.
-   * 
-   * @parameter
+   * List of packages to generate assertions for.
    */
+  @Parameter(property = "assertj.packages")
   public String[] packages;
 
-  public void execute() throws MojoExecutionException {
+  /**
+   * List of classes to generate assertions for.
+   */
+  @Parameter(property = "assertj.classes")
+  public String[] classes;
+
+  @Override
+  public void execute() throws MojoExecutionException, MojoFailureException {
+    failIfMojoParametersAreMissing();
     try {
       logExecutionStart();
       String assertionsEntryPointPathname = newAssertionGenerator().generateAssertionSources(packages, targetDir);
       logExecutionEnd(assertionsEntryPointPathname);
       project.addTestCompileSourceRoot(targetDir);
     } catch (Exception e) {
-      throw new MojoExecutionException(e.getMessage());
+      throw new MojoExecutionException(e.getMessage(), e);
+    }
+  }
+
+  private void failIfMojoParametersAreMissing() throws MojoFailureException {
+    if (isEmpty(packages) && isEmpty(classes)) {
+      throw new MojoFailureException(shouldHaveNonEmptyPackagesOrClasses());
     }
   }
 
   private void logExecutionStart() {
-    getLog().info("About to generate AssertJ assertions for classes in following packages and subpackages : ");
-    for (String pack : packages) {
-      getLog().info("- " + pack);
+    if (isNotEmpty(packages)) {
+      getLog().info("About to generate AssertJ assertions for classes in following packages and subpackages : ");
+      for (String pack : packages) {
+        getLog().info(element(pack));
+      }
+    }
+    if (isNotEmpty(classes)) {
+      getLog().info("About to generate AssertJ assertions for classes : ");
+      for (String clazz : classes) {
+        getLog().info(element(clazz));
+      }
     }
   }
-  
+
   private void logExecutionEnd(String assertionsEntryPointPathname) {
     getLog().info(" ");
     getLog().info("AssertJ assertions classes have been generated in: " + targetDir);
     getLog().info("Custom assertions entry point class has been generated in: " + assertionsEntryPointPathname);
+  }
+
+  private static String element(String pack) {
+    return "- " + pack;
   }
 
   private AssertionsGenerator newAssertionGenerator() throws Exception {
@@ -99,4 +132,8 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     return new URLClassLoader(runtimeUrls, Thread.currentThread().getContextClassLoader());
   }
 
+  @VisibleForTesting
+  static String shouldHaveNonEmptyPackagesOrClasses() {
+    return format("Parameter 'packages' or 'classes' must be set to generate assertions.%n[Help] https://github.com/joel-costigliola/assertj-assertions-generator-maven-plugin");
+  }
 }
