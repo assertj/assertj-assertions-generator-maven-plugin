@@ -2,6 +2,7 @@ package org.assertj.maven.generator;
 
 import static org.assertj.assertions.generator.util.ClassUtil.collectClasses;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
@@ -19,32 +20,40 @@ public class AssertionsGenerator {
   private ClassToClassDescriptionConverter converter;
   private ClassLoader classLoader;
   private BaseAssertionGenerator generator;
+  private Set<ClassDescription> classDescriptions;
+  private File assertionsEntryPointFile;
 
   public AssertionsGenerator(ClassLoader classLoader) throws FileNotFoundException, IOException {
     this.generator = new BaseAssertionGenerator();
     this.converter = new ClassToClassDescriptionConverter();
     this.classLoader = classLoader;
+    this.classDescriptions = new HashSet<ClassDescription>();
   }
 
   /**
    * Generates custom assertions for classes in given packages with the Assertions class entry point in given
    * destination dir.
-   * <p>
-   * It returns the Assertions entry point file path.
    * 
    * @param packages the packages containing the classes we want to generate Assert classes for.
    * @param destDir the base directory where the classes are going to be generated.
-   * @return the Assertions entry point file path
-   * @throws Exception
+   * @throws IOException if the files can't be generated 
    */
-  public String generateAssertionSources(String[] packages, String destDir) throws Exception {
+  public void generateAssertionSources(String[] packages, String destDir) throws IOException {
     generator.setDirectoryWhereAssertionFilesAreGenerated(destDir);
-    Set<ClassDescription> classDescriptions = new HashSet<ClassDescription>();
+    classDescriptions = new HashSet<ClassDescription>();
     for (Class<?> clazz : collectClasses(classLoader, packages)) {
       ClassDescription classDescription = converter.convertToClassDescription(clazz);
       generator.generateCustomAssertionFor(classDescription);
       classDescriptions.add(classDescription);
     }
-    return generator.generateAssertionsEntryPointFor(classDescriptions).getPath();
+    assertionsEntryPointFile = generator.generateAssertionsEntryPointFor(classDescriptions);
+  }
+  
+  public Set<ClassDescription> getClassDescriptionsOfGeneratedAssertionsClass() {
+    return classDescriptions;
+  }
+  
+  public File getAssertionsEntryPointFile() {
+    return assertionsEntryPointFile;
   }
 }

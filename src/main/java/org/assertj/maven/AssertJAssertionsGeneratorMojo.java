@@ -79,8 +79,9 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     failIfMojoParametersAreMissing();
     try {
       logExecutionStart();
-      String assertionsEntryPointPathname = newAssertionGenerator().generateAssertionSources(packages, targetDir);
-      logExecutionEnd(assertionsEntryPointPathname);
+      AssertionsGenerator assertionGenerator = newAssertionGenerator();
+      assertionGenerator.generateAssertionSources(packages, targetDir);
+      logExecutionEnd(assertionGenerator);
       project.addTestCompileSourceRoot(targetDir);
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage(), e);
@@ -108,10 +109,15 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     }
   }
 
-  private void logExecutionEnd(String assertionsEntryPointPathname) {
-    getLog().info(" ");
-    getLog().info("AssertJ assertions classes have been generated in: " + targetDir);
-    getLog().info("Custom assertions entry point class has been generated in: " + assertionsEntryPointPathname);
+  private void logExecutionEnd(AssertionsGenerator assertionGenerator) {
+    if (assertionGenerator.getClassDescriptionsOfGeneratedAssertionsClass().isEmpty()) {
+      getLog().info("No classes found to generate AssertJ assertions classes for !");
+    } else {
+      getLog().info(" ");
+      getLog().info("AssertJ assertions classes have been generated in: " + targetDir);
+      getLog().info("Custom assertions entry point class has been generated in: "
+          + assertionGenerator.getAssertionsEntryPointFile());
+    }
   }
 
   private static String element(String pack) {

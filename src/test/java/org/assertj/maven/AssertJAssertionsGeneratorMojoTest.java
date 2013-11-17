@@ -39,7 +39,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   @Test
-  public void testExecute() throws Exception {
+  public void executing_plugin_with_good_configuration_should_pass() throws Exception {
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test", "org.assertj.maven.test2");
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
@@ -52,7 +52,18 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(assertionsFileFor(Address.class)).exists();
     assertThat(assertionsEntryPointFile()).exists();
   }
+  
+  @Test
+  public void executing_plugin_with_fake_package_fail_with_errors() throws Exception {
+    assertjAssertionsGeneratorMojo.packages = array("fakepackage");
+    List<String> classes = newArrayList();
+    when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
+    
+    assertjAssertionsGeneratorMojo.execute();
 
+    assertThat(temporaryFolder.getRoot().list()).isEmpty();
+    
+  }
 
   @Test
   public void should_fail_if_packages_and_classes_parameters_are_null() throws Exception {
