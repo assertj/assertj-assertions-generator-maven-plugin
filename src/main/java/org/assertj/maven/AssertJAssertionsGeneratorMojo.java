@@ -19,6 +19,8 @@ import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;

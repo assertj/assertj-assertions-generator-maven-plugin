@@ -17,6 +17,7 @@ public class AssertionsGeneratorReport {
   private String directoryPathWhereAssertionFilesAreGenerated;
   private List<String> generatedCustomAssertionFileNames;
   private File assertionsEntryPointFile;
+  private File softAssertionsEntryPointFile;
   private String[] inputPackages;
   private String[] inputClasses;
   private Exception exception;
@@ -68,6 +69,9 @@ public class AssertionsGeneratorReport {
     reportBuilder.append("\n");
     reportBuilder.append("Assertions entry point class has been generated in file:\n");
     reportBuilder.append(INDENT).append(assertionsEntryPointFile.getAbsolutePath()).append("\n");
+    reportBuilder.append("\n");
+    reportBuilder.append("Soft Assertions entry point class has been generated in file:\n");
+    reportBuilder.append(INDENT).append(softAssertionsEntryPointFile.getAbsolutePath()).append("\n");
   }
 
   /**
@@ -139,6 +143,10 @@ public class AssertionsGeneratorReport {
 
   public void setAssertionsEntryPointFile(File assertionsEntryPointFile) {
     this.assertionsEntryPointFile = assertionsEntryPointFile;
+  }
+
+  public void setSoftAssertionsEntryPointFile(File softAssertionsEntryPointFile) {
+    this.softAssertionsEntryPointFile = softAssertionsEntryPointFile;
   }
 
   public void setInputPackages(String[] packages) {

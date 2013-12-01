@@ -53,8 +53,10 @@ public class AssertionsGenerator {
       report.setInputPackages(packages);
       report.setInputClasses(classes);
       report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
-      File standardAssertionsEntryPointFile = generator.generateAssertionsEntryPointFor(classDescriptions);
+      File standardAssertionsEntryPointFile = generator.generateStandardAssertionsEntryPointClassFor(classDescriptions);
       report.setAssertionsEntryPointFile(standardAssertionsEntryPointFile);
+      File softAssertionsEntryPointFile = generator.generateSoftAssertionsEntryPointClassFor(classDescriptions);
+      report.setSoftAssertionsEntryPointFile(softAssertionsEntryPointFile);
     } catch (Exception e) {
       report.setException(e);
     }
