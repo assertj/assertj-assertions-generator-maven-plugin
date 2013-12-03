@@ -30,7 +30,7 @@ You need to have AssertJ Core as a dependency in your `pom.xml` :
 <dependency>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-core</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
     <scope>test</scope>
 </dependency>
 ```
