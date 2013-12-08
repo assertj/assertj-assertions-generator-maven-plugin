@@ -37,12 +37,9 @@ import org.assertj.maven.generator.AssertionsGenerator;
 import org.assertj.maven.generator.AssertionsGeneratorReport;
 
 /**
- * Generates custom AssertJ assertions files for provided packages
+ * Generates custom AssertJ assertions (*Assert) for all given classes and classes of given packages.
  */
-@Mojo(name = "generate-assertions",
-    defaultPhase = GENERATE_TEST_SOURCES,
-    requiresDependencyResolution = COMPILE_PLUS_RUNTIME,
-    requiresProject = true)
+@Mojo(name = "generate-assertions", defaultPhase = GENERATE_TEST_SOURCES, requiresDependencyResolution = COMPILE_PLUS_RUNTIME, requiresProject = true)
 public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   /**
@@ -52,12 +49,11 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public MavenProject project;
 
   /**
-   * Destination dir to store generated assertion source files. Defaults to
-   * 'target/generated-test-sources/assertj-assertions'.<br>
+   * Destination dir to store generated assertion source files. <br>
+   * Defaults to 'target/generated-test-sources/assertj-assertions'.<br>
    * Your IDE should be able to pick up files from this location as sources automatically when generated.
    */
-  @Parameter(defaultValue = "${project.build.directory}/generated-test-sources/assertj-assertions",
-      property = "assertj.targetDir")
+  @Parameter(defaultValue = "${project.build.directory}/generated-test-sources/assertj-assertions", property = "assertj.targetDir")
   public String targetDir;
 
   /**
