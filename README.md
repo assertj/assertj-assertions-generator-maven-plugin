@@ -90,7 +90,7 @@ Assertions entry point class has been generated in file:
 Releases
 --
 
-**2013-09-15 : 1.2.0 release**
+**2013-12-08 : 1.2.0 release**
 * Uses assertj-assertions-generator [1.2.0](https://github.com/joel-costigliola/assertj-assertions-generator#latest-news) version.
 * To ease using generated assertions, generate an entry point class `Assertions` providing `assertThat` methods giving access to each generated `*Assert` classes.
 * Better logs to understand what the plugin has done.
