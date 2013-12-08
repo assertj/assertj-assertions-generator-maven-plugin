@@ -14,8 +14,91 @@ By default, it generates the assertions source files in `target/generated-test-s
 
 **Big thanks** to [Michal Ostruszka](https://github.com/mostr) for its major contribution on this plugin.
 
+Since **1.2.0** version, the generator also creates an `Assertions` class with `assertThat` methods giving access to each generated `*Assert` classes.  
+In the case where `PlayerAssert` and `GameAssert` have been generated, the generator will also create the `Assertions` class below:
+
+```java
+public class Assertions {
+
+  /**
+   * Creates a new instance of <code>{@link GameAssert}</code>.
+   *
+   * @param actual the actual value.
+   * @return the created assertion object.
+   */
+  public static GameAssert assertThat(Game actual) {
+    return new GameAssert(actual);
+  }
+
+  /**
+   * Creates a new instance of <code>{@link PlayerAssert}</code>.
+   *
+   * @param actual the actual value.
+   * @return the created assertion object.
+   */
+  public static PlayerAssert assertThat(Player actual) {
+    return new PlayerAssert(actual);
+  }
+
+  /**
+   * Creates a new </code>{@link Assertions}</code>.
+   */
+  protected Assertions() {
+    // empty
+  }
+}
+```
+
+**Example of plugin execution:**
+
+```
+====================================
+AssertJ assertions generation report
+====================================
+
+--- Generator input parameters ---
+
+Generating AssertJ assertions for classes in following packages and subpackages:
+- org.assertj.examples.data
+
+--- Generator results ---
+
+Directory where custom assertions files have been generated :
+- /home/joe/assertj/assertj-examples/target/generated-test-sources/assertj-assertions
+
+Custom assertions files generated :
+- TeamAssert.java
+- BasketBallPlayerAssert.java
+- EmployeeAssert.java
+- NameAssert.java
+- MagicalAssert.java
+- PersonAssert.java
+- RaceAssert.java
+- GameServiceAssert.java
+- MansionAssert.java
+- TitleAssert.java
+- AlignmentAssert.java
+- TolkienCharacterAssert.java
+- RingAssert.java
+- MovieAssert.java
+- TeamManagerAssert.java
+
+Assertions entry point class has been generated in file:
+- /home/joe/assertj/assertj-examples/target/generated-test-sources/assertj-assertions/org/assertj/examples/data/Assertions.java
+```
+
 Releases
 --
+
+**2013-09-15 : 1.2.0 release**
+* Uses assertj-assertions-generator [1.2.0](https://github.com/joel-costigliola/assertj-assertions-generator#latest-news) version.
+* To ease using generated assertions, generate an entry point class `Assertions` providing `assertThat` methods giving access to each generated `*Assert` classes.
+* Better logs to understand what the plugin has done.
+* Define property for each parameter: classes, packages and targetDir. *(Jean Christophe Gay)*
+* Generate Help Mojo accessible via `mvn assertj:help`. *(Jean Christophe Gay)*
+* Use up to date @parameter syntax to fix warning logs. *(Jean Christophe Gay)*
+
+Special thanks to **Jean Christophe Gay** for its contributions to this version.
 
 **2013-09-15 : 1.1.0 release : Uses assertj-assertions-generator [1.1.0](https://github.com/joel-costigliola/assertj-assertions-generator#latest-news) version.**
 
