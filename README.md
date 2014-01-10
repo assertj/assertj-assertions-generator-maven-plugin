@@ -124,7 +124,7 @@ To generate custom assertions, add the following plugin to your `pom.xml` build/
 <plugin>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <configuration>
         <packages>
             <param>your.first.package</param>
@@ -168,7 +168,7 @@ To generate assertions classes at every build, add an `<executions>` section as 
 <plugin>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <executions>
         <execution>
             <goals>
