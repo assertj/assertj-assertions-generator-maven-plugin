@@ -1,4 +1,4 @@
-Maven plugin for assertj-assertions-generator
+Maven plugin to generate AssertJ assertions 
 ==
 
 ## Overview 
@@ -56,3 +56,5 @@ Assertions entry point class has been generated in file:
 ## Documentation
 
 Please have a look at the complete documentation in [**assertj.org assertions generator section**](http://joel-costigliola.github.io/assertj/assertj-assertions-generator-maven-plugin.html), including a [**quickstart guide**](http://joel-costigliola.github.io/assertj/assertj-assertions-generator-maven-plugin.html#quickstart).
+
+[![Build Status](https://assertj.ci.cloudbees.com/buildStatus/icon?job=assertj-assertions-generator-maven-plugin)](https://assertj.ci.cloudbees.com/job/assertj-assertions-generator-maven-plugin/)
