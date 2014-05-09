@@ -18,6 +18,7 @@ public class AssertionsGeneratorReport {
   private List<String> generatedCustomAssertionFileNames;
   private File assertionsEntryPointFile;
   private File softAssertionsEntryPointFile;
+  private File bddAssertionsEntryPointFile;
   private String[] inputPackages;
   private String[] inputClasses;
   private Exception exception;
@@ -72,6 +73,9 @@ public class AssertionsGeneratorReport {
     reportBuilder.append("\n");
     reportBuilder.append("Soft Assertions entry point class has been generated in file:\n");
     reportBuilder.append(INDENT).append(softAssertionsEntryPointFile.getAbsolutePath()).append("\n");
+    reportBuilder.append("\n");
+    reportBuilder.append("BDD Assertions entry point class has been generated in file:\n");
+    reportBuilder.append(INDENT).append(bddAssertionsEntryPointFile.getAbsolutePath()).append("\n");
   }
 
   /**
@@ -161,4 +165,7 @@ public class AssertionsGeneratorReport {
     this.exception = exception;
   }
 
+  public void setBddAssertionsEntryPointFile(final File bddAssertionsEntryPointFile) {
+    this.bddAssertionsEntryPointFile = bddAssertionsEntryPointFile;
+  }
 }

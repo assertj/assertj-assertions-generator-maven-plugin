@@ -55,7 +55,9 @@ public class AssertJAssertionsGeneratorMojoTest {
     // check that expected assertions file exist (we don't check the content we suppose the generator works).
     assertThat(assertionsFileFor(Employee.class)).exists();
     assertThat(assertionsFileFor(Address.class)).exists();
-    assertThat(assertionsEntryPointFile()).exists();
+    assertThat(assertionsEntryPointFile("Assertions.java")).exists();
+    assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
+    assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
   }
 
   @Test
@@ -68,7 +70,9 @@ public class AssertJAssertionsGeneratorMojoTest {
 
     // check that expected assertions file exist (we don't check the content we suppose the generator works).
     assertThat(assertionsFileFor(Employee.class)).exists();
-    assertThat(assertionsEntryPointFile()).exists();
+    assertThat(assertionsEntryPointFile("Assertions.java")).exists();
+    assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
+    assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
   }
 
   @Test
@@ -115,8 +119,8 @@ public class AssertJAssertionsGeneratorMojoTest {
     return clazz.getPackage().getName().replace('.', File.separatorChar) + File.separator + clazz.getSimpleName();
   }
 
-  private File assertionsEntryPointFile() throws IOException {
+  private File assertionsEntryPointFile(String simpleName) throws IOException {
     return temporaryFolder.newFile("org.assertj.maven.test".replace('.', File.separatorChar) + File.separator
-        + "Assertions.java");
+        + simpleName);
   }
 }

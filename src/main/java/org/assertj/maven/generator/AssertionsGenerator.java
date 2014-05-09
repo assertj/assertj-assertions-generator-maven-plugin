@@ -57,6 +57,8 @@ public class AssertionsGenerator {
       report.setAssertionsEntryPointFile(standardAssertionsEntryPointFile);
       File softAssertionsEntryPointFile = generator.generateSoftAssertionsEntryPointClassFor(classDescriptions);
       report.setSoftAssertionsEntryPointFile(softAssertionsEntryPointFile);
+      File bddAssertionsEntryPointFile = generator.generateBddAssertionsEntryPointFor(classDescriptions);
+      report.setBddAssertionsEntryPointFile(bddAssertionsEntryPointFile);
     } catch (Exception e) {
       report.setException(e);
     }
