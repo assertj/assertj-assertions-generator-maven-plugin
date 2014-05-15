@@ -1,5 +1,8 @@
 package org.assertj.maven.generator;
 
+import static org.assertj.assertions.generator.AssertionsEntryPointType.BDD;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.SOFT;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.STANDARD;
 import static org.assertj.assertions.generator.util.ClassUtil.collectClasses;
 
 import java.io.File;
@@ -53,11 +56,11 @@ public class AssertionsGenerator {
       report.setInputPackages(packages);
       report.setInputClasses(classes);
       report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
-      File standardAssertionsEntryPointFile = generator.generateStandardAssertionsEntryPointClassFor(classDescriptions);
+      File standardAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions, STANDARD, null);
       report.setAssertionsEntryPointFile(standardAssertionsEntryPointFile);
-      File softAssertionsEntryPointFile = generator.generateSoftAssertionsEntryPointClassFor(classDescriptions);
+      File softAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions, SOFT, null);
       report.setSoftAssertionsEntryPointFile(softAssertionsEntryPointFile);
-      File bddAssertionsEntryPointFile = generator.generateBddAssertionsEntryPointFor(classDescriptions);
+      File bddAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions, BDD, null);
       report.setBddAssertionsEntryPointFile(bddAssertionsEntryPointFile);
     } catch (Exception e) {
       report.setException(e);
