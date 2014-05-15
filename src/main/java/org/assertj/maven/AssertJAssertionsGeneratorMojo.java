@@ -19,8 +19,6 @@ import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -69,6 +67,13 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
    */
   @Parameter(property = "assertj.classes")
   public String[] classes;
+  
+  /**
+   * An optional package name for the Assertions entry point class. If omitted, the package will be determined
+   * heuristically from the generated assertions.
+   */
+  @Parameter(property = "assertj.entryPointClassPackage")
+  public String entryPointClassPackage;
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
@@ -82,7 +87,8 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   @VisibleForTesting
   void executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) {
-    AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir);
+    AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
+        entryPointClassPackage);
     getLog().info(generatorReport.getReportContent());
     project.addTestCompileSourceRoot(targetDir);
   }

@@ -74,6 +74,19 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
     assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
   }
+  
+  @Test
+  public void executing_plugin_with_custom_entry_point_class_package_should_pass() throws Exception {
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.entryPointClassPackage = "my.custom.pkg";
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
+
+    assertjAssertionsGeneratorMojo.execute();
+
+    assertThat(assertionsFileFor(Employee.class)).exists();
+    assertThat(assertionsEntryPointFileWithCustomPackage()).exists();
+  }
 
   @Test
   public void executing_plugin_with_fake_package_should_not_generated_anything() throws Exception {
@@ -122,5 +135,10 @@ public class AssertJAssertionsGeneratorMojoTest {
   private File assertionsEntryPointFile(String simpleName) throws IOException {
     return temporaryFolder.newFile("org.assertj.maven.test".replace('.', File.separatorChar) + File.separator
         + simpleName);
+  }
+
+  private File assertionsEntryPointFileWithCustomPackage() throws IOException {
+    return temporaryFolder.newFile("my.custom.pkg".replace('.', File.separatorChar) + File.separator
+        + "Assertions.java");
   }
 }

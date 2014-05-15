@@ -40,9 +40,11 @@ public class AssertionsGenerator {
    * @param packages the packages containing the classes we want to generate Assert classes for.
    * @param classes the packages containing the classes we want to generate Assert classes for.
    * @param destDir the base directory where the classes are going to be generated.
+   * @param entryPointFilePackage the package of the assertions entry point class, may be <code>null</code>.
    * @throws IOException if the files can't be generated
    */
-  public AssertionsGeneratorReport generateAssertionsFor(String[] packages, String[] classes, String destDir) {
+  public AssertionsGeneratorReport generateAssertionsFor(String[] packages, String[] classes, String destDir,
+                                                         String entryPointFilePackage) {
     generator.setDirectoryWhereAssertionFilesAreGenerated(destDir);
     Set<ClassDescription> classDescriptions = new HashSet<ClassDescription>();
     AssertionsGeneratorReport report = new AssertionsGeneratorReport();
@@ -56,11 +58,15 @@ public class AssertionsGenerator {
       report.setInputPackages(packages);
       report.setInputClasses(classes);
       report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
-      File standardAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions, STANDARD, null);
+      File standardAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions,
+                                                                                             STANDARD,
+                                                                                             entryPointFilePackage);
       report.setAssertionsEntryPointFile(standardAssertionsEntryPointFile);
-      File softAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions, SOFT, null);
+      File softAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions, SOFT,
+                                                                                         entryPointFilePackage);
       report.setSoftAssertionsEntryPointFile(softAssertionsEntryPointFile);
-      File bddAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions, BDD, null);
+      File bddAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions, BDD,
+                                                                                        entryPointFilePackage);
       report.setBddAssertionsEntryPointFile(bddAssertionsEntryPointFile);
     } catch (Exception e) {
       report.setException(e);
