@@ -69,6 +69,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public String[] classes;
   
   /**
+   * Flag specifying whether to generate hierarchical assertions. The default is false.
+   */
+  @Parameter(defaultValue = "false", property = "assertj.hierarchical")
+  public boolean hierarchical;
+  
+  /**
    * An optional package name for the Assertions entry point class. If omitted, the package will be determined
    * heuristically from the generated assertions.
    */
@@ -88,7 +94,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @VisibleForTesting
   void executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) {
     AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
-        entryPointClassPackage);
+        entryPointClassPackage, hierarchical);
     getLog().info(generatorReport.getReportContent());
     project.addTestCompileSourceRoot(targetDir);
   }

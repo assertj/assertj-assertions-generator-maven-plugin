@@ -61,6 +61,26 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   @Test
+  public void executing_plugin_with_hierarchical_option_should_generate_hierarchical_assertions() throws Exception {
+    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test", "org.assertj.maven.test2");
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.hierarchical = true;
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
+
+    assertjAssertionsGeneratorMojo.execute();
+
+    // check that expected assertions file exist (we don't check the content we suppose the generator works).
+    assertThat(assertionsFileFor(Employee.class)).exists();
+    assertThat(abstractAssertionsFileFor(Employee.class)).exists();
+    assertThat(assertionsFileFor(Address.class)).exists();
+    assertThat(abstractAssertionsFileFor(Address.class)).exists();
+    assertThat(assertionsEntryPointFile("Assertions.java")).exists();
+    assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
+    assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
+  }
+
+  @Test
   public void executing_plugin_with_classes_parameter_only_should_pass() throws Exception {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee", "org.assertj.maven.test2.adress.Address");
     List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
@@ -128,8 +148,15 @@ public class AssertJAssertionsGeneratorMojoTest {
     return temporaryFolder.newFile(basePathName(clazz) + "Assert.java");
   }
 
+  private File abstractAssertionsFileFor(Class<?> clazz) throws IOException {
+	return temporaryFolder.newFile(basePathName("Abstract", clazz) + "Assert.java");
+  }
+
   private static String basePathName(Class<?> clazz) {
-    return clazz.getPackage().getName().replace('.', File.separatorChar) + File.separator + clazz.getSimpleName();
+    return basePathName("", clazz);
+  }
+  private static String basePathName(String prefix, Class<?> clazz) {
+    return clazz.getPackage().getName().replace('.', File.separatorChar) + File.separator + prefix + clazz.getSimpleName();
   }
 
   private File assertionsEntryPointFile(String simpleName) throws IOException {
