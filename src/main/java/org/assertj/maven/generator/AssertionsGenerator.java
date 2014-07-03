@@ -1,5 +1,7 @@
 package org.assertj.maven.generator;
 
+import static com.google.common.collect.Sets.newLinkedHashSet;
+import static org.apache.commons.collections.CollectionUtils.subtract;
 import static org.assertj.assertions.generator.AssertionsEntryPointType.BDD;
 import static org.assertj.assertions.generator.AssertionsEntryPointType.SOFT;
 import static org.assertj.assertions.generator.AssertionsEntryPointType.STANDARD;
@@ -9,7 +11,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -38,38 +39,40 @@ public class AssertionsGenerator {
    * destination dir.
    * 
    * @param packages the packages containing the classes we want to generate Assert classes for.
-   * @param classes the packages containing the classes we want to generate Assert classes for.
+   * @param classesName the packages containing the classes we want to generate Assert classes for.
    * @param destDir the base directory where the classes are going to be generated.
    * @param entryPointFilePackage the package of the assertions entry point class, may be <code>null</code>.
    * @throws IOException if the files can't be generated
    */
-  public AssertionsGeneratorReport generateAssertionsFor(String[] packages, String[] classes, String destDir,
+  @SuppressWarnings("unchecked")
+  public AssertionsGeneratorReport generateAssertionsFor(String[] packages, String[] classesName, String destDir,
                                                          String entryPointFilePackage, boolean hierarchical) {
     generator.setDirectoryWhereAssertionFilesAreGenerated(destDir);
     Set<ClassDescription> classDescriptions = new HashSet<ClassDescription>();
     AssertionsGeneratorReport report = new AssertionsGeneratorReport();
     try {
-      List<Class<?>> classList = collectClasses(classLoader, ArrayUtils.addAll(packages, classes));
+      Set<Class<?>> classes = collectClasses(classLoader, ArrayUtils.addAll(packages, classesName));
+      Set<Class<?>> filteredClasses = removeAssertClasses(classes);
+      report.setExcludedClassesFromAssertionGeneration(subtract(classes, filteredClasses));
+      report.setInputPackages(packages);
+      report.setInputClasses(classesName);
+      report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
       if (hierarchical) {
-        Set<Class<?>> classSet = new HashSet<Class<?>>(classList);
-        for (Class<?> clazz : classList) {
+        for (Class<?> clazz : filteredClasses) {
           ClassDescription classDescription = converter.convertToClassDescription(clazz);
-          File[] generatedCustomAssertionFiles = generator.generateHierarchicalCustomAssertionFor(classDescription, classSet);
+          File[] generatedCustomAssertionFiles = generator.generateHierarchicalCustomAssertionFor(classDescription, filteredClasses);
           report.addGeneratedAssertionFile(generatedCustomAssertionFiles[0]);
           report.addGeneratedAssertionFile(generatedCustomAssertionFiles[1]);
           classDescriptions.add(classDescription);
         }
       } else {
-        for (Class<?> clazz : classList) {
+        for (Class<?> clazz : filteredClasses) {
           ClassDescription classDescription = converter.convertToClassDescription(clazz);
           File generatedCustomAssertionFile = generator.generateCustomAssertionFor(classDescription);
           report.addGeneratedAssertionFile(generatedCustomAssertionFile);
           classDescriptions.add(classDescription);
         }
       }
-      report.setInputPackages(packages);
-      report.setInputClasses(classes);
-      report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
       File standardAssertionsEntryPointFile = generator.generateAssertionsEntryPointClassFor(classDescriptions, STANDARD,
                                                                                              entryPointFilePackage);
       report.setAssertionsEntryPointFile(standardAssertionsEntryPointFile);
@@ -83,6 +86,16 @@ public class AssertionsGenerator {
       report.setException(e);
     }
     return report;
+  }
+
+  private Set<Class<?>> removeAssertClasses(Set<Class<?>> classList) {
+    Set<Class<?>> filteredClassList = newLinkedHashSet();
+    for (Class<?> clazz : classList) {
+      if (!clazz.getSimpleName().endsWith("Assert")) {
+        filteredClassList.add(clazz);
+      }
+    }
+    return filteredClassList;
   }
 
   @VisibleForTesting

@@ -79,17 +79,28 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
     assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
   }
-
+  
+  @Test
+  public void shoud_not_generate_assertions_for_assert_classes() throws Exception {
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.MyAssert");
+    assertjAssertionsGeneratorMojo.packages = array("some.package");
+    assertjAssertionsGeneratorMojo.hierarchical = true;
+    assertjAssertionsGeneratorMojo.execute();
+    assertThat(assertionsFileFor("org.assertj.maven.test.MyAssertAssert")).doesNotExist();
+  }
+  
   @Test
   public void executing_plugin_with_classes_parameter_only_should_pass() throws Exception {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee", "org.assertj.maven.test2.adress.Address");
-    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    List<String> classes = newArrayList(Address.class.getName());
+    assertjAssertionsGeneratorMojo.hierarchical = true;
     when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
 
     assertjAssertionsGeneratorMojo.execute();
 
     // check that expected assertions file exist (we don't check the content we suppose the generator works).
     assertThat(assertionsFileFor(Employee.class)).exists();
+    assertThat(assertionsFileFor(Address.class)).exists();
     assertThat(assertionsEntryPointFile("Assertions.java")).exists();
     assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
     assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
@@ -109,7 +120,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   @Test
-  public void executing_plugin_with_fake_package_should_not_generated_anything() throws Exception {
+  public void executing_plugin_with_fake_package_should_not_generate_anything() throws Exception {
     assertjAssertionsGeneratorMojo.packages = array("fakepackage");
     List<String> classes = newArrayList();
     when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
@@ -125,7 +136,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     when(mavenProject.getRuntimeClasspathElements()).thenReturn(newArrayList(Employee.class.getName()));
     // let's throws an IOException when generating custom assertions
-    AssertionsGenerator generator = new AssertionsGenerator(null);
+    AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
     BaseAssertionGenerator baseGenerator = mock(BaseAssertionGenerator.class);
     generator.setBaseGenerator(baseGenerator);
     when(baseGenerator.generateCustomAssertionFor(Mockito.any(ClassDescription.class))).thenThrow(IOException.class);
@@ -145,11 +156,15 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   private File assertionsFileFor(Class<?> clazz) throws IOException {
-    return temporaryFolder.newFile(basePathName(clazz) + "Assert.java");
+    return new File(temporaryFolder.getRoot(), basePathName(clazz) + "Assert.java");
   }
 
+  private File assertionsFileFor(String className) throws IOException {
+    return new File(temporaryFolder.getRoot(), className.replace('.', File.separatorChar)+".java");
+  }
+  
   private File abstractAssertionsFileFor(Class<?> clazz) throws IOException {
-	return temporaryFolder.newFile(basePathName("Abstract", clazz) + "Assert.java");
+    return new File(temporaryFolder.getRoot(), basePathName("Abstract", clazz) + "Assert.java");
   }
 
   private static String basePathName(Class<?> clazz) {
@@ -160,12 +175,10 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   private File assertionsEntryPointFile(String simpleName) throws IOException {
-    return temporaryFolder.newFile("org.assertj.maven.test".replace('.', File.separatorChar) + File.separator
-        + simpleName);
+    return new File(temporaryFolder.getRoot(), "org.assertj.maven.test".replace('.', File.separatorChar) + File.separator + simpleName);
   }
 
   private File assertionsEntryPointFileWithCustomPackage() throws IOException {
-    return temporaryFolder.newFile("my.custom.pkg".replace('.', File.separatorChar) + File.separator
-        + "Assertions.java");
+    return new File(temporaryFolder.getRoot(), "my.custom.pkg".replace('.', File.separatorChar) + File.separator + "Assertions.java");
   }
 }

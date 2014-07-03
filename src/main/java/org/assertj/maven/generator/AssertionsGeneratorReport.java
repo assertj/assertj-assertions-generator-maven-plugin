@@ -1,11 +1,14 @@
 package org.assertj.maven.generator;
 
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -15,16 +18,17 @@ public class AssertionsGeneratorReport {
   private static final String SECTION_START = "--- ";
   private static final String SECTION_END = " ---\n";
   private String directoryPathWhereAssertionFilesAreGenerated;
-  private List<String> generatedCustomAssertionFileNames;
+  private Set<String> generatedCustomAssertionFileNames;
   private File assertionsEntryPointFile;
   private File softAssertionsEntryPointFile;
   private File bddAssertionsEntryPointFile;
   private String[] inputPackages;
   private String[] inputClasses;
   private Exception exception;
+  private Collection<Class<?>> excludedClassesFromAssertionGeneration;
 
   public AssertionsGeneratorReport() {
-    generatedCustomAssertionFileNames = new ArrayList<String>();
+    generatedCustomAssertionFileNames = new TreeSet<String>();
     directoryPathWhereAssertionFilesAreGenerated = "no directory set";
   }
 
@@ -32,8 +36,8 @@ public class AssertionsGeneratorReport {
     this.directoryPathWhereAssertionFilesAreGenerated = directory;
   }
 
-  public void addGeneratedAssertionFile(File generatedCustomAssertionFile) {
-    generatedCustomAssertionFileNames.add(generatedCustomAssertionFile.getName());
+  public void addGeneratedAssertionFile(File generatedCustomAssertionFile) throws IOException {
+    generatedCustomAssertionFileNames.add(generatedCustomAssertionFile.getCanonicalPath());
   }
 
   public String getReportContent() {
@@ -86,9 +90,14 @@ public class AssertionsGeneratorReport {
     reportBuilder.append("No assertions generated as no classes have been found from given classes/packages.\n");
     if (isNotEmpty(inputClasses)) {
       reportBuilder.append(INDENT).append("Given classes : ").append(Arrays.toString(inputClasses));
+      reportBuilder.append("\n");
     }
     if (isNotEmpty(inputPackages)) {
       reportBuilder.append(INDENT).append("Given packages : ").append(Arrays.toString(inputPackages));
+      reportBuilder.append("\n");
+    }
+    if (isNotEmpty(excludedClassesFromAssertionGeneration)) {
+      reportBuilder.append(INDENT).append("Excluded classes : ").append(excludedClassesFromAssertionGeneration);
     }
   }
 
@@ -98,12 +107,16 @@ public class AssertionsGeneratorReport {
   private void buildGeneratorReportError(StringBuilder reportBuilder) {
     reportBuilder.append("\n");
     reportBuilder.append("Assertions failed with error : ").append(exception.getMessage());
+    reportBuilder.append("\n");
     if (isNotEmpty(inputClasses)) {
       reportBuilder.append(INDENT).append("Given classes were : ").append(Arrays.toString(inputClasses));
+      reportBuilder.append("\n");
     }
     if (isNotEmpty(inputPackages)) {
       reportBuilder.append(INDENT).append("Given packages were : ").append(Arrays.toString(inputPackages));
+      reportBuilder.append("\n");
     }
+    reportBuilder.append("\n");
     reportBuilder.append("Full error stack : ").append(ExceptionUtils.getStackTrace(exception));
   }
 
@@ -127,6 +140,13 @@ public class AssertionsGeneratorReport {
       reportBuilder.append("Generating AssertJ assertions for classes:\n");
       for (String inputClass : inputClasses) {
         reportBuilder.append(INDENT).append(inputClass).append("\n");
+      }
+    }
+    if (isNotEmpty(excludedClassesFromAssertionGeneration)) {
+      reportBuilder.append("\n");
+      reportBuilder.append("Input classes excluded from assertions generation:\n");
+      for (Class<?> excludedClass : excludedClassesFromAssertionGeneration) {
+        reportBuilder.append(INDENT).append(excludedClass.getName()).append("\n");
       }
     }
   }
@@ -167,5 +187,9 @@ public class AssertionsGeneratorReport {
 
   public void setBddAssertionsEntryPointFile(final File bddAssertionsEntryPointFile) {
     this.bddAssertionsEntryPointFile = bddAssertionsEntryPointFile;
+  }
+
+  public void setExcludedClassesFromAssertionGeneration(Collection<Class<?>> excludedClassSet) {
+    this.excludedClassesFromAssertionGeneration = excludedClassSet;
   }
 }
