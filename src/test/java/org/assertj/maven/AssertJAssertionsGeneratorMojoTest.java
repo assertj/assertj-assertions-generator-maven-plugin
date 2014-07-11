@@ -48,7 +48,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test", "org.assertj.maven.test2");
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
-    when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 
     assertjAssertionsGeneratorMojo.execute();
 
@@ -66,7 +66,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     assertjAssertionsGeneratorMojo.hierarchical = true;
     List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
-    when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 
     assertjAssertionsGeneratorMojo.execute();
 
@@ -94,7 +94,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee", "org.assertj.maven.test2.adress.Address");
     List<String> classes = newArrayList(Address.class.getName());
     assertjAssertionsGeneratorMojo.hierarchical = true;
-    when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 
     assertjAssertionsGeneratorMojo.execute();
 
@@ -111,7 +111,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     assertjAssertionsGeneratorMojo.entryPointClassPackage = "my.custom.pkg";
     List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
-    when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 
     assertjAssertionsGeneratorMojo.execute();
 
@@ -123,7 +123,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   public void executing_plugin_with_fake_package_should_not_generate_anything() throws Exception {
     assertjAssertionsGeneratorMojo.packages = array("fakepackage");
     List<String> classes = newArrayList();
-    when(mavenProject.getRuntimeClasspathElements()).thenReturn(classes);
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 
     assertjAssertionsGeneratorMojo.execute();
 
@@ -134,7 +134,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   @Test
   public void executing_plugin_with_error_should_be_reported_in_generator_report() throws Exception {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
-    when(mavenProject.getRuntimeClasspathElements()).thenReturn(newArrayList(Employee.class.getName()));
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(Employee.class.getName()));
     // let's throws an IOException when generating custom assertions
     AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
     BaseAssertionGenerator baseGenerator = mock(BaseAssertionGenerator.class);

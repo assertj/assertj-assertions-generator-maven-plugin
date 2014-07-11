@@ -107,10 +107,10 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   private ClassLoader getProjectClassLoader() throws DependencyResolutionRequiredException, MalformedURLException {
     @SuppressWarnings("unchecked")
-    List<String> runtimeClasspathElements = project.getRuntimeClasspathElements();
-    URL[] runtimeUrls = new URL[runtimeClasspathElements.size()];
-    for (int i = 0; i < runtimeClasspathElements.size(); i++) {
-      runtimeUrls[i] = new File(runtimeClasspathElements.get(i)).toURI().toURL();
+    List<String> compileClasspathElements = project.getCompileClasspathElements();
+    URL[] runtimeUrls = new URL[compileClasspathElements.size()];
+    for (int i = 0; i < compileClasspathElements.size(); i++) {
+      runtimeUrls[i] = new File(compileClasspathElements.get(i)).toURI().toURL();
     }
     return new URLClassLoader(runtimeUrls, Thread.currentThread().getContextClassLoader());
   }
