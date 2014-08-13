@@ -22,7 +22,10 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.List;
+
+import javassist.expr.NewArray;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -31,7 +34,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-
 import org.assertj.core.util.VisibleForTesting;
 import org.assertj.maven.generator.AssertionsGenerator;
 import org.assertj.maven.generator.AssertionsGeneratorReport;
@@ -105,14 +107,15 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private ClassLoader getProjectClassLoader() throws DependencyResolutionRequiredException, MalformedURLException {
-    @SuppressWarnings("unchecked")
-    List<String> compileClasspathElements = project.getCompileClasspathElements();
-    URL[] compileClasspathElementUrls = new URL[compileClasspathElements.size()];
-    for (int i = 0; i < compileClasspathElements.size(); i++) {
-      compileClasspathElementUrls[i] = new File(compileClasspathElements.get(i)).toURI().toURL();
+    List<String> classpathElements = new ArrayList<String>(project.getCompileClasspathElements());
+    classpathElements.addAll(project.getTestClasspathElements());
+    List<URL> classpathElementUrls = new ArrayList<URL>(classpathElements.size());
+    for (int i = 0; i < classpathElements.size(); i++) {
+      classpathElementUrls.add(new File(classpathElements.get(i)).toURI().toURL());
     }
-    return new URLClassLoader(compileClasspathElementUrls, Thread.currentThread().getContextClassLoader());
+    return new URLClassLoader(classpathElementUrls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
   }
 
   @VisibleForTesting
