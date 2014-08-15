@@ -16,7 +16,7 @@ package org.assertj.maven;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
-import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
+import static org.apache.maven.plugins.annotations.ResolutionScope.TEST;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -39,7 +39,8 @@ import org.assertj.maven.generator.AssertionsGeneratorReport;
 /**
  * Generates custom AssertJ assertions (*Assert) for all given classes and classes of given packages.
  */
-@Mojo(name = "generate-assertions", defaultPhase = GENERATE_TEST_SOURCES, requiresDependencyResolution = COMPILE_PLUS_RUNTIME, requiresProject = true)
+@Mojo(name = "generate-assertions",
+    defaultPhase = GENERATE_TEST_SOURCES, requiresDependencyResolution = TEST, requiresProject = true)
 public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   /**
@@ -67,13 +68,13 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
    */
   @Parameter(property = "assertj.classes")
   public String[] classes;
-  
+
   /**
    * Flag specifying whether to generate hierarchical assertions. The default is false.
    */
   @Parameter(defaultValue = "false", property = "assertj.hierarchical")
   public boolean hierarchical;
-  
+
   /**
    * An optional package name for the Assertions entry point class. If omitted, the package will be determined
    * heuristically from the generated assertions.
@@ -94,7 +95,8 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @VisibleForTesting
   void executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) {
     AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
-        entryPointClassPackage, hierarchical);
+                                                                                         entryPointClassPackage,
+                                                                                         hierarchical);
     getLog().info(generatorReport.getReportContent());
     project.addTestCompileSourceRoot(targetDir);
   }
