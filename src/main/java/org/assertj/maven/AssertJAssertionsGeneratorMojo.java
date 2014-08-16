@@ -43,6 +43,8 @@ import org.assertj.maven.generator.AssertionsGeneratorReport;
     defaultPhase = GENERATE_TEST_SOURCES, requiresDependencyResolution = TEST, requiresProject = true)
 public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
+  private static final String[] INCLUDE_ALL_CLASSES = { ".*" };
+
   /**
    * Current maven project
    */
@@ -68,6 +70,20 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
    */
   @Parameter(property = "assertj.classes")
   public String[] classes;
+
+  /**
+   * Generated assertions are limited to classes matching one of the given regular expressions, default is to include
+   * all classes.
+   */
+  @Parameter(property = "assertj.includes")
+  public String[] includes = INCLUDE_ALL_CLASSES;
+
+  /**
+   * If class macthes one of the given regex, no assertions will be generated for it, default is not to exclude
+   * anything.
+   */
+  @Parameter(property = "assertj.excludes")
+  public String[] excludes = new String[0];
 
   /**
    * Flag specifying whether to generate hierarchical assertions. The default is false.
@@ -96,7 +112,11 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     }
     failIfMojoParametersAreMissing();
     try {
-      executeWithAssertionGenerator(new AssertionsGenerator(getProjectClassLoader()));
+      AssertionsGenerator assertionGenerator = new AssertionsGenerator(getProjectClassLoader());
+      assertionGenerator.setIncludePatterns(includes);
+      assertionGenerator.setExcludePatterns(excludes);
+      assertionGenerator.setLog(getLog());
+      executeWithAssertionGenerator(assertionGenerator);
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage(), e);
     }
