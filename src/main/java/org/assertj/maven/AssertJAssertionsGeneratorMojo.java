@@ -82,8 +82,18 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @Parameter(property = "assertj.entryPointClassPackage")
   public String entryPointClassPackage;
 
+  /**
+   * Skip generating classes, handy way to disable the plugin.
+   */
+  @Parameter(property = "assertj.skip")
+  public boolean skip = false;
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
+    if (skip) {
+      getLog().info("Assertions generator is disabled since 'skip' option is true.");
+      return;
+    }
     failIfMojoParametersAreMissing();
     try {
       executeWithAssertionGenerator(new AssertionsGenerator(getProjectClassLoader()));

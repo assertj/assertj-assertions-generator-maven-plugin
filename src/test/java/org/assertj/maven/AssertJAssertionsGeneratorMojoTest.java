@@ -124,6 +124,18 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.packages = array("fakepackage");
     List<String> classes = newArrayList();
     when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+    
+    assertjAssertionsGeneratorMojo.execute();
+    
+    assertThat(temporaryFolder.getRoot().list()).isEmpty();
+  }
+  
+  @Test
+  public void executing_plugin_with_skip_set_to_true_should_not_generate_anything() throws Exception {
+    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.skip = true;
+    List<String> classes = newArrayList();
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 
     assertjAssertionsGeneratorMojo.execute();
 
