@@ -58,7 +58,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(assertionsEntryPointFile("Assertions.java")).exists();
     assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
     assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
-  }
+  } 
 
   @Test
   public void executing_plugin_with_hierarchical_option_should_generate_hierarchical_assertions() throws Exception {
@@ -126,6 +126,26 @@ public class AssertJAssertionsGeneratorMojoTest {
 
     assertThat(assertionsFileFor(Employee.class)).exists();
     assertThat(assertionsEntryPointFileWithCustomPackage()).exists();
+  }
+
+  @Test
+  public void should_not_generate_entry_point_classes_if_disabled() throws Exception {
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    List<String> classes = newArrayList(Employee.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+    assertjAssertionsGeneratorMojo.generateAssertions = false;
+    assertjAssertionsGeneratorMojo.generateBddAssertions = false;
+    assertjAssertionsGeneratorMojo.generateSoftAssertions = false;
+    assertjAssertionsGeneratorMojo.generateJUnitSoftAssertions = false;
+    
+    assertjAssertionsGeneratorMojo.execute();
+
+    // check that expected assertions file exist (we don't check the content we suppose the generator works).
+    assertThat(assertionsFileFor(Employee.class)).exists();
+    assertThat(assertionsEntryPointFile("Assertions.java")).doesNotExist();
+    assertThat(assertionsEntryPointFile("BddAssertions.java")).doesNotExist();
+    assertThat(assertionsEntryPointFile("SoftAssertions.java")).doesNotExist();
+    assertThat(assertionsEntryPointFile("JUniSoftAssertions.java")).doesNotExist();
   }
 
   @Test

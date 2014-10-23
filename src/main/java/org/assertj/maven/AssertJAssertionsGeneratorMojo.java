@@ -17,6 +17,10 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.TEST;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.BDD;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.JUNIT_SOFT;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.SOFT;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.STANDARD;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -104,52 +108,94 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @Parameter(property = "assertj.skip")
   public boolean skip = false;
 
+  /**
+   * Generate Assertions entry point class.
+   */
+  @Parameter(property = "assertj.generate.Assertions")
+  public boolean generateAssertions = true;
+
+  /**
+   * Generate generating BDD Assertions entry point class.
+   */
+  @Parameter(property = "assertj.generate.BddAssertions")
+  public boolean generateBddAssertions = true;
+
+  /**
+   * Generate generating JUnit Soft Assertions entry point class.
+   */
+  @Parameter(property = "assertj.generate.JUnitSoftAssertions")
+  public boolean generateJUnitSoftAssertions = true;
+
+  /**
+   * Generate generating Soft Assertions entry point class.
+   */
+  @Parameter(property = "assertj.generate.SoftAssertions")
+  public boolean generateSoftAssertions = true;
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
-    if (skip) {
-      getLog().info("Assertions generator is disabled since 'skip' option is true.");
-      return;
-    }
-    failIfMojoParametersAreMissing();
-    try {
-      AssertionsGenerator assertionGenerator = new AssertionsGenerator(getProjectClassLoader());
-      assertionGenerator.setIncludePatterns(includes);
-      assertionGenerator.setExcludePatterns(excludes);
-      assertionGenerator.setLog(getLog());
-      executeWithAssertionGenerator(assertionGenerator);
-    } catch (Exception e) {
-      throw new MojoExecutionException(e.getMessage(), e);
-    }
+	if (skip) {
+	  getLog().info("Assertions generator is disabled since 'skip' option is true.");
+	  return;
+	}
+	failIfMojoParametersAreMissing();
+	try {
+	  ClassLoader projectClassLoader = getProjectClassLoader();
+	  AssertionsGenerator assertionGenerator = new AssertionsGenerator(projectClassLoader);
+	  assertionGenerator.setIncludePatterns(includes);
+	  assertionGenerator.setExcludePatterns(excludes);
+	  if (generateAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(STANDARD);
+	  if (generateBddAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(BDD);
+	  if (generateSoftAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(SOFT);
+	  if (generateJUnitSoftAssertions) {
+		if (junitFoundBy(projectClassLoader)) assertionGenerator.enableEntryPointClassesGenerationFor(JUNIT_SOFT);
+		else getLog().info("JUnit not found in project classpath => JUnitSoftAssertions entry point class won't be generated.");
+	  }
+	  assertionGenerator.setLog(getLog());
+	  executeWithAssertionGenerator(assertionGenerator);
+	} catch (Exception e) {
+	  throw new MojoExecutionException(e.getMessage(), e);
+	}
   }
 
   @VisibleForTesting
   void executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) {
-    AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
-                                                                                         entryPointClassPackage,
-                                                                                         hierarchical);
-    getLog().info(generatorReport.getReportContent());
-    project.addTestCompileSourceRoot(targetDir);
+	AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
+	                                                                                     entryPointClassPackage,
+	                                                                                     hierarchical);
+	getLog().info(generatorReport.getReportContent());
+	project.addTestCompileSourceRoot(targetDir);
   }
 
   private void failIfMojoParametersAreMissing() throws MojoFailureException {
-    if (isEmpty(packages) && isEmpty(classes)) {
-      throw new MojoFailureException(shouldHaveNonEmptyPackagesOrClasses());
-    }
+	if (isEmpty(packages) && isEmpty(classes)) {
+	  throw new MojoFailureException(shouldHaveNonEmptyPackagesOrClasses());
+	}
   }
 
   @SuppressWarnings("unchecked")
   private ClassLoader getProjectClassLoader() throws DependencyResolutionRequiredException, MalformedURLException {
-    List<String> classpathElements = new ArrayList<String>(project.getCompileClasspathElements());
-    classpathElements.addAll(project.getTestClasspathElements());
-    List<URL> classpathElementUrls = new ArrayList<URL>(classpathElements.size());
-    for (int i = 0; i < classpathElements.size(); i++) {
-      classpathElementUrls.add(new File(classpathElements.get(i)).toURI().toURL());
-    }
-    return new URLClassLoader(classpathElementUrls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+	List<String> classpathElements = new ArrayList<String>(project.getCompileClasspathElements());
+	classpathElements.addAll(project.getTestClasspathElements());
+	List<URL> classpathElementUrls = new ArrayList<URL>(classpathElements.size());
+	for (int i = 0; i < classpathElements.size(); i++) {
+	  classpathElementUrls.add(new File(classpathElements.get(i)).toURI().toURL());
+	}
+	return new URLClassLoader(classpathElementUrls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
   }
 
   @VisibleForTesting
   static String shouldHaveNonEmptyPackagesOrClasses() {
-    return format("Parameter 'packages' or 'classes' must be set to generate assertions.%n[Help] https://github.com/joel-costigliola/assertj-assertions-generator-maven-plugin");
+	return format("Parameter 'packages' or 'classes' must be set to generate assertions.%n[Help] https://github.com/joel-costigliola/assertj-assertions-generator-maven-plugin");
   }
+
+  private boolean junitFoundBy(ClassLoader projectClassLoader) {
+	try {
+	  Class.forName("org.junit.Rule", false, projectClassLoader);
+	  return true;
+	} catch (ClassNotFoundException e) {
+	  return false;
+	}
+  }
+
 }
