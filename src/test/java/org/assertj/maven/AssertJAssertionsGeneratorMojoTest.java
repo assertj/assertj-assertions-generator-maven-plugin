@@ -6,6 +6,7 @@ import static org.assertj.core.util.Arrays.array;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.assertj.maven.AssertJAssertionsGeneratorMojo.shouldHaveNonEmptyPackagesOrClasses;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -17,6 +18,7 @@ import org.apache.maven.project.MavenProject;
 import org.assertj.assertions.generator.BaseAssertionGenerator;
 import org.assertj.assertions.generator.description.ClassDescription;
 import org.assertj.maven.generator.AssertionsGenerator;
+import org.assertj.maven.generator.AssertionsGeneratorReport;
 import org.assertj.maven.test.Employee;
 import org.assertj.maven.test.name.Name;
 import org.assertj.maven.test.name.NameService;
@@ -25,7 +27,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
 
 public class AssertJAssertionsGeneratorMojoTest {
 
@@ -237,12 +238,26 @@ public class AssertJAssertionsGeneratorMojoTest {
     AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
     BaseAssertionGenerator baseGenerator = mock(BaseAssertionGenerator.class);
     generator.setBaseGenerator(baseGenerator);
-    when(baseGenerator.generateCustomAssertionFor(Mockito.any(ClassDescription.class))).thenThrow(IOException.class);
-    assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
+    when(baseGenerator.generateCustomAssertionFor(any(ClassDescription.class))).thenThrow(IOException.class);
+    AssertionsGeneratorReport report = assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
 
+    assertThat(report.getReportedException()).isInstanceOf(IOException.class);
     assertThat(temporaryFolder.getRoot().list()).isEmpty();
   }
 
+  @Test
+  public void input_classes_not_found_should_be_listed_in_generator_report() throws Exception {
+	assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee", "org.Foo", "org.Bar");
+	when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(Employee.class.getName()));
+	AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
+	
+	AssertionsGeneratorReport report = assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
+	
+    // check that expected assertions file exist (we don't check the content we suppose the generator works).
+    assertThat(assertionsFileFor(Employee.class)).exists();
+    assertThat(report.getInputClassesNotFound()).as("check report").containsExactly("org.Bar", "org.Foo");
+  }
+  
   @Test
   public void should_fail_if_packages_and_classes_parameters_are_null() throws Exception {
     try {

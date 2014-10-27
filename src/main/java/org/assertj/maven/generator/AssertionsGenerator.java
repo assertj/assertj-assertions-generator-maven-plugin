@@ -2,6 +2,7 @@ package org.assertj.maven.generator;
 
 import static com.google.common.collect.Sets.newLinkedHashSet;
 import static org.apache.commons.collections.CollectionUtils.subtract;
+import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.assertj.assertions.generator.util.ClassUtil.collectClasses;
 import static org.assertj.core.util.Arrays.isNullOrEmpty;
 import static org.assertj.core.util.Sets.newHashSet;
@@ -14,7 +15,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.assertj.assertions.generator.AssertionsEntryPointType;
 import org.assertj.assertions.generator.BaseAssertionGenerator;
@@ -70,22 +70,23 @@ public class AssertionsGenerator {
    * Generates custom assertions for classes in given packages with the Assertions class entry point in given
    * destination dir.
    * 
-   * @param packages the packages containing the classes we want to generate Assert classes for.
-   * @param classesName the packages containing the classes we want to generate Assert classes for.
+   * @param inputPackages the packages containing the classes we want to generate Assert classes for.
+   * @param inputClassNames the packages containing the classes we want to generate Assert classes for.
    * @param destDir the base directory where the classes are going to be generated.
    * @param entryPointFilePackage the package of the assertions entry point class, may be <code>null</code>.
    * @throws IOException if the files can't be generated
    */
   @SuppressWarnings("unchecked")
-  public AssertionsGeneratorReport generateAssertionsFor(String[] packages, String[] classesName, String destDir,
+  public AssertionsGeneratorReport generateAssertionsFor(String[] inputPackages, String[] inputClassNames, String destDir,
 	                                                     String entryPointFilePackage, boolean hierarchical) {
 	generator.setDirectoryWhereAssertionFilesAreGenerated(destDir);
 	Set<ClassDescription> classDescriptions = new HashSet<ClassDescription>();
 	AssertionsGeneratorReport report = new AssertionsGeneratorReport();
-	report.setInputPackages(packages);
-	report.setInputClasses(classesName);
+	report.setInputPackages(inputPackages);
+	report.setInputClasses(inputClassNames);
 	try {
-	  Set<Class<?>> classes = collectClasses(classLoader, ArrayUtils.addAll(packages, classesName));
+	  Set<Class<?>> classes = collectClasses(classLoader, addAll(inputPackages, inputClassNames));
+	  report.reportInputClassesNotFound(classes, inputClassNames);
 	  Set<Class<?>> filteredClasses = removeAssertClasses(classes);
 	  removeClassesAccordingToIncludeAndExcludePatterns(filteredClasses);
 	  report.setExcludedClassesFromAssertionGeneration(subtract(classes, filteredClasses));

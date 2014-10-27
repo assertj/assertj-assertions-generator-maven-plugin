@@ -135,7 +135,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 	if (skip) {
-	  getLog().info("Assertions generator is disabled since 'skip' option is true.");
+	  getLog().info("Assertions generator is disabled as 'skip' option is true.");
 	  return;
 	}
 	failIfMojoParametersAreMissing();
@@ -159,12 +159,14 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   }
 
   @VisibleForTesting
-  void executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) {
+  AssertionsGeneratorReport executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) {
+	if (classes == null) classes = new String[0];
 	AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
 	                                                                                     entryPointClassPackage,
 	                                                                                     hierarchical);
 	getLog().info(generatorReport.getReportContent());
 	project.addTestCompileSourceRoot(targetDir);
+	return generatorReport;
   }
 
   private void failIfMojoParametersAreMissing() throws MojoFailureException {

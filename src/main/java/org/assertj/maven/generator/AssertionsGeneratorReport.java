@@ -28,10 +28,12 @@ public class AssertionsGeneratorReport {
   private String[] inputClasses;
   private Exception exception;
   private Collection<Class<?>> excludedClassesFromAssertionGeneration;
+  private Set<String> inputClassesNotFound;
 
   public AssertionsGeneratorReport() {
 	assertionsEntryPointFilesByType = newTreeMap();
 	generatedCustomAssertionFileNames = newTreeSet();
+	inputClassesNotFound = newTreeSet();
 	directoryPathWhereAssertionFilesAreGenerated = "no directory set";
   }
 
@@ -64,12 +66,19 @@ public class AssertionsGeneratorReport {
 
   private void buildGeneratorReportSuccess(StringBuilder reportBuilder) {
 	reportBuilder.append("\n");
-	reportBuilder.append("Directory where custom assertions files have been generated :\n");
+	reportBuilder.append("Directory where custom assertions files have been generated:\n");
 	reportBuilder.append(INDENT).append(directoryPathWhereAssertionFilesAreGenerated).append("\n");
 	reportBuilder.append("\n");
-	reportBuilder.append("Custom assertions files generated :\n");
+	reportBuilder.append("Custom assertions files generated:\n");
 	for (String fileName : generatedCustomAssertionFileNames) {
 	  reportBuilder.append(INDENT).append(fileName).append("\n");
+	}
+	if (!inputClassesNotFound.isEmpty()) {
+	  reportBuilder.append("\n");
+	  reportBuilder.append("No custom assertions files generated for the following input classes as they were not found:\n");
+	  for (String inputClassNotFound : inputClassesNotFound) {
+		reportBuilder.append(INDENT).append(inputClassNotFound).append("\n");
+	  }
 	}
 	reportEntryPointClassesGeneration(reportBuilder);
   }
@@ -152,7 +161,8 @@ public class AssertionsGeneratorReport {
 	return generatedCustomAssertionFileNames.isEmpty();
   }
 
-  public void reportEntryPointGeneration(AssertionsEntryPointType assertionsEntryPointType, File assertionsEntryPointFile) {
+  public void reportEntryPointGeneration(AssertionsEntryPointType assertionsEntryPointType,
+	                                     File assertionsEntryPointFile) {
 	this.assertionsEntryPointFilesByType.put(assertionsEntryPointType, assertionsEntryPointFile);
   }
 
@@ -168,7 +178,27 @@ public class AssertionsGeneratorReport {
 	this.exception = exception;
   }
 
+  public Exception getReportedException() {
+	return exception;
+  }
+
   public void setExcludedClassesFromAssertionGeneration(Collection<Class<?>> excludedClassSet) {
 	this.excludedClassesFromAssertionGeneration = excludedClassSet;
+  }
+
+  public Set<String> getInputClassesNotFound() {
+	return inputClassesNotFound;
+  }
+
+  public void reportInputClassesNotFound(Set<Class<?>> classes, String[] inputClassNames) {
+	Set<String> classesFound = newTreeSet();
+	for (Class<?> clazz : classes) {
+	  classesFound.add(clazz.getName());
+	}
+	for (String inputClass : inputClassNames) {
+	  if (!classesFound.contains(inputClass)) {
+		inputClassesNotFound.add(inputClass);
+	  }
+	}
   }
 }
