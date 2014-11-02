@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.5.0</version>
+  <version>1.5.1-SNAPSHOT</version>
   <name>Maven plugin for AssertJ assertions generator</name>
 
   <parent>
@@ -15,7 +15,7 @@
     <developerConnection>scm:git:git@github.com:joel-costigliola/assertj-assertions-generator-maven-plugin.git</developerConnection>
     <connection>scm:git:git@github.com:joel-costigliola/assertj-assertions-generator-maven-plugin.git</connection>
     <url>git@github.com:joel-costigliola/assertj-assertions-generator-maven-plugin</url>
-    <tag>assertj-assertions-generator-maven-plugin-1.5.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <build>
