@@ -99,12 +99,12 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-assertions-generator</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>[1.6.1, 1.7.0]</version>
+      <version>[1.6.1, 2.0.0)</version>
     </dependency>
     <dependency>
       <groupId>commons-collections</groupId>
