@@ -131,6 +131,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @Parameter(property = "assertj.generate.SoftAssertions")
   public boolean generateSoftAssertions = true;
 
+  /**
+   * Generate generating Soft Assertions entry point class.
+   */
+  @Parameter(property = "assertj.templates")
+  public Templates templates;
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 	if (skip) {
@@ -160,9 +166,9 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @VisibleForTesting
   AssertionsGeneratorReport executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) {
 	if (classes == null) classes = new String[0];
-	AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
-	                                                                                     entryPointClassPackage,
-	                                                                                     hierarchical);
+    AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
+                                                                                         entryPointClassPackage,
+                                                                                         hierarchical, templates);
 	getLog().info(generatorReport.getReportContent());
 	project.addTestCompileSourceRoot(targetDir);
 	return generatorReport;

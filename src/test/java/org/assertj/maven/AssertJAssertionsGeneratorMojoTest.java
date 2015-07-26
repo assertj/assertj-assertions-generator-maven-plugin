@@ -13,12 +13,13 @@
 package org.assertj.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.contentOf;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.assertj.core.util.Arrays.array;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.assertj.maven.AssertJAssertionsGeneratorMojo.shouldHaveNonEmptyPackagesOrClasses;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -88,6 +89,27 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(abstractAssertionsFileFor(Employee.class)).exists();
     assertThat(assertionsFileFor(Address.class)).exists();
     assertThat(abstractAssertionsFileFor(Address.class)).exists();
+    assertThat(assertionsEntryPointFile("Assertions.java")).exists();
+    assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
+    assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
+  }
+
+  @Test
+  public void should_generate_assertions_with_user_templates() throws Exception {
+    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test", "org.assertj.maven.test2");
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.templates = new Templates();
+    assertjAssertionsGeneratorMojo.templates.templateDirectory = "src/test/resources/";
+    assertjAssertionsGeneratorMojo.templates.hasAssertionTemplate = "my_has_assertion_template.txt";
+    List<String> classes = newArrayList(Employee.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+
+    assertjAssertionsGeneratorMojo.execute();
+
+    // check that expected assertions file exist (we don't check the content we suppose the generator works).
+    File employeeAssertFile = assertionsFileFor(Employee.class);
+    assertThat(employeeAssertFile).exists();
+    assertThat(contentOf(employeeAssertFile)).contains("System.out.println");
     assertThat(assertionsEntryPointFile("Assertions.java")).exists();
     assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
     assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
