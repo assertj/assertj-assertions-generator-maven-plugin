@@ -35,9 +35,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.plugin.logging.Log;
 import org.assertj.assertions.generator.Template;
 import org.assertj.core.util.VisibleForTesting;
+import org.assertj.maven.generator.AssertionsGeneratorReport;
 
 public class Templates {
 
@@ -62,47 +62,48 @@ public class Templates {
   public String bddEntryPointAssertionClassTemplate;
   public String bddEntryPointAssertionMethodTemplate;
 
-  public List<Template> getTemplates(Log log) {
+  public List<Template> getTemplates(AssertionsGeneratorReport report) {
     // resolve user templates directory
     if (templateDirectory == null) templateDirectory = "./";
     // load any templates overridden by the user
     List<Template> userTemplates = new ArrayList<>();
     // @format:off
     // assertion class templates
-    loadUserTemplate(assertionClassTemplate, ASSERT_CLASS, "'class assertions'", userTemplates, log);
-    loadUserTemplate(hierarchicalAssertionConcreteClassTemplate, HIERARCHICAL_ASSERT_CLASS, "'hierarchical concrete class assertions'", userTemplates, log);
-    loadUserTemplate(hierarchicalAssertionAbstractClassTemplate, ABSTRACT_ASSERT_CLASS, "'hierarchical abstract class assertions'", userTemplates, log);
+    loadUserTemplate(assertionClassTemplate, ASSERT_CLASS, "'class assertions'", userTemplates, report);
+    loadUserTemplate(hierarchicalAssertionConcreteClassTemplate, HIERARCHICAL_ASSERT_CLASS, "'hierarchical concrete class assertions'", userTemplates, report);
+    loadUserTemplate(hierarchicalAssertionAbstractClassTemplate, ABSTRACT_ASSERT_CLASS, "'hierarchical abstract class assertions'", userTemplates, report);
     // assertion method templates
-    loadUserTemplate(hasAssertionTemplate, HAS, "'has assertions'", userTemplates, log);
-    loadUserTemplate(isAssertionTemplate, IS, "'is assertions'", userTemplates, log);
-    loadUserTemplate(arrayHasElementsAssertionTemplate, HAS_FOR_ARRAY, "'array has assertions'", userTemplates, log);
-    loadUserTemplate(iterableHasElementsAssertionTemplate, HAS_FOR_ITERABLE, "'iterable has assertions'", userTemplates, log);
-    loadUserTemplate(primitiveHasAssertionTemplate, HAS_FOR_PRIMITIVE, "'primitive type has assertions'", userTemplates, log);
-    loadUserTemplate(realNumberHasAssertionTemplate, HAS_FOR_REAL_NUMBER, "'real number has assertions'", userTemplates, log);
+    loadUserTemplate(hasAssertionTemplate, HAS, "'has assertions'", userTemplates, report);
+    loadUserTemplate(isAssertionTemplate, IS, "'is assertions'", userTemplates, report);
+    loadUserTemplate(arrayHasElementsAssertionTemplate, HAS_FOR_ARRAY, "'array has assertions'", userTemplates, report);
+    loadUserTemplate(iterableHasElementsAssertionTemplate, HAS_FOR_ITERABLE, "'iterable has assertions'", userTemplates, report);
+    loadUserTemplate(primitiveHasAssertionTemplate, HAS_FOR_PRIMITIVE, "'primitive type has assertions'", userTemplates, report);
+    loadUserTemplate(realNumberHasAssertionTemplate, HAS_FOR_REAL_NUMBER, "'real number has assertions'", userTemplates, report);
     // entry point templates
-    loadUserTemplate(assertionsEntryPointClassTemplate,ASSERTIONS_ENTRY_POINT_CLASS, "'assertions entry point class'", userTemplates, log);
-    loadUserTemplate(assertionEntryPointMethodTemplate,ASSERTION_ENTRY_POINT,  "'assertions entry point method'", userTemplates, log);
-    loadUserTemplate(softEntryPointAssertionClassTemplate, SOFT_ASSERTIONS_ENTRY_POINT_CLASS, "'soft assertions entry point class'", userTemplates, log);
-    loadUserTemplate(junitSoftEntryPointAssertionClassTemplate, JUNIT_SOFT_ASSERTIONS_ENTRY_POINT_CLASS, "'junit soft assertions entry point class'", userTemplates, log);
-    loadUserTemplate(softEntryPointAssertionMethodTemplate, SOFT_ENTRY_POINT_METHOD_ASSERTION, "'soft assertions entry point method'", userTemplates, log);
-    loadUserTemplate(bddEntryPointAssertionClassTemplate, BDD_ASSERTIONS_ENTRY_POINT_CLASS, "'BDD assertions entry point class'", userTemplates, log);
-    loadUserTemplate(bddEntryPointAssertionMethodTemplate, BDD_ENTRY_POINT_METHOD_ASSERTION, "'BDD assertions entry point method'", userTemplates, log);
+    loadUserTemplate(assertionsEntryPointClassTemplate,ASSERTIONS_ENTRY_POINT_CLASS, "'assertions entry point class'", userTemplates, report);
+    loadUserTemplate(assertionEntryPointMethodTemplate,ASSERTION_ENTRY_POINT,  "'assertions entry point method'", userTemplates, report);
+    loadUserTemplate(softEntryPointAssertionClassTemplate, SOFT_ASSERTIONS_ENTRY_POINT_CLASS, "'soft assertions entry point class'", userTemplates, report);
+    loadUserTemplate(junitSoftEntryPointAssertionClassTemplate, JUNIT_SOFT_ASSERTIONS_ENTRY_POINT_CLASS, "'junit soft assertions entry point class'", userTemplates, report);
+    loadUserTemplate(softEntryPointAssertionMethodTemplate, SOFT_ENTRY_POINT_METHOD_ASSERTION, "'soft assertions entry point method'", userTemplates, report);
+    loadUserTemplate(bddEntryPointAssertionClassTemplate, BDD_ASSERTIONS_ENTRY_POINT_CLASS, "'BDD assertions entry point class'", userTemplates, report);
+    loadUserTemplate(bddEntryPointAssertionMethodTemplate, BDD_ENTRY_POINT_METHOD_ASSERTION, "'BDD assertions entry point method'", userTemplates, report);
     // @format:on
     return userTemplates;
   }
 
   @VisibleForTesting
   void loadUserTemplate(String userTemplate, Template.Type type, String templateDescription,
-                        List<Template> userTemplates, Log log) {
+                        List<Template> userTemplates, AssertionsGeneratorReport report) {
     if (userTemplate != null) {
-      log.info("Loading custom template for " + templateDescription + " from " + templateDirectory + userTemplate);
       try {
         File templateFile = new File(templateDirectory, userTemplate);
         String templateContent = readFileToString(templateFile, UTF_8);
         userTemplates.add(new Template(type, templateContent));
+        report.registerUserTemplate("Using custom template for " + templateDescription + " loaded from "
+                                    + templateDirectory + userTemplate);
       } catch (Exception e) {
         // best effort : if we can't read user template, use the default one.
-        log.warn("Use default " + templateDescription
+        report.registerUserTemplate("Use default " + templateDescription
                  + " assertion template as we failed to to read user template from "
                  + templateDirectory + userTemplate);
       }

@@ -21,8 +21,10 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,12 +43,14 @@ public class AssertionsGeneratorReport {
   private Exception exception;
   private Collection<Class<?>> excludedClassesFromAssertionGeneration;
   private Set<String> inputClassesNotFound;
+  private List<String> userTemplates;
 
   public AssertionsGeneratorReport() {
 	assertionsEntryPointFilesByType = newTreeMap();
 	generatedCustomAssertionFileNames = newTreeSet();
 	inputClassesNotFound = newTreeSet();
 	directoryPathWhereAssertionFilesAreGenerated = "no directory set";
+    userTemplates = new ArrayList<>();
   }
 
   public void setDirectoryPathWhereAssertionFilesAreGenerated(String directory) {
@@ -58,13 +62,13 @@ public class AssertionsGeneratorReport {
   }
 
   public String getReportContent() {
-	StringBuilder reportBuilder = new StringBuilder("\n");
-	reportBuilder.append("\n");
+    StringBuilder reportBuilder = new StringBuilder(System.lineSeparator());
+    reportBuilder.append(System.lineSeparator());
 	reportBuilder.append("====================================\n");
 	reportBuilder.append("AssertJ assertions generation report\n");
 	reportBuilder.append("====================================\n");
 	buildGeneratorParametersReport(reportBuilder);
-	reportBuilder.append("\n");
+    reportBuilder.append(System.lineSeparator());
 	reportBuilder.append(SECTION_START).append("Generator results").append(SECTION_END);
 	if (generationError()) {
 	  buildGeneratorReportError(reportBuilder);
@@ -77,19 +81,19 @@ public class AssertionsGeneratorReport {
   }
 
   private void buildGeneratorReportSuccess(StringBuilder reportBuilder) {
-	reportBuilder.append("\n");
+    reportBuilder.append(System.lineSeparator());
 	reportBuilder.append("Directory where custom assertions files have been generated:\n");
-	reportBuilder.append(INDENT).append(directoryPathWhereAssertionFilesAreGenerated).append("\n");
-	reportBuilder.append("\n");
+    reportBuilder.append(INDENT).append(directoryPathWhereAssertionFilesAreGenerated).append(System.lineSeparator());
+    reportBuilder.append(System.lineSeparator());
 	reportBuilder.append("Custom assertions files generated:\n");
 	for (String fileName : generatedCustomAssertionFileNames) {
-	  reportBuilder.append(INDENT).append(fileName).append("\n");
+      reportBuilder.append(INDENT).append(fileName).append(System.lineSeparator());
 	}
 	if (!inputClassesNotFound.isEmpty()) {
-	  reportBuilder.append("\n");
+      reportBuilder.append(System.lineSeparator());
 	  reportBuilder.append("No custom assertions files generated for the following input classes as they were not found:\n");
 	  for (String inputClassNotFound : inputClassesNotFound) {
-		reportBuilder.append(INDENT).append(inputClassNotFound).append("\n");
+        reportBuilder.append(INDENT).append(inputClassNotFound).append(System.lineSeparator());
 	  }
 	}
 	reportEntryPointClassesGeneration(reportBuilder);
@@ -99,23 +103,24 @@ public class AssertionsGeneratorReport {
 	for (AssertionsEntryPointType type : assertionsEntryPointFilesByType.keySet()) {
 	  if (assertionsEntryPointFilesByType.get(type) != null) {
 		String entryPointClassName = remove(type.getFileName(), ".java");
-		reportBuilder.append("\n")
+        reportBuilder.append(System.lineSeparator())
 		             .append(entryPointClassName).append(" entry point class has been generated in file:\n")
-		             .append(INDENT).append(assertionsEntryPointFilesByType.get(type).getAbsolutePath()).append("\n");
+                     .append(INDENT).append(assertionsEntryPointFilesByType.get(type).getAbsolutePath())
+                     .append(System.lineSeparator());
 	  }
 	}
   }
 
   private void buildGeneratorReportWhenNothingWasGenerated(StringBuilder reportBuilder) {
-	reportBuilder.append("\n");
+    reportBuilder.append(System.lineSeparator());
 	reportBuilder.append("No assertions generated as no classes have been found from given classes/packages.\n");
 	if (isNotEmpty(inputClasses)) {
 	  reportBuilder.append(INDENT).append("Given classes : ").append(Arrays.toString(inputClasses));
-	  reportBuilder.append("\n");
+      reportBuilder.append(System.lineSeparator());
 	}
 	if (isNotEmpty(inputPackages)) {
 	  reportBuilder.append(INDENT).append("Given packages : ").append(Arrays.toString(inputPackages));
-	  reportBuilder.append("\n");
+      reportBuilder.append(System.lineSeparator());
 	}
 	if (isNotEmpty(excludedClassesFromAssertionGeneration)) {
 	  reportBuilder.append(INDENT).append("Excluded classes : ").append(excludedClassesFromAssertionGeneration);
@@ -123,44 +128,52 @@ public class AssertionsGeneratorReport {
   }
 
   private void buildGeneratorReportError(StringBuilder reportBuilder) {
-	reportBuilder.append("\n");
+    reportBuilder.append(System.lineSeparator());
 	reportBuilder.append("Assertions failed with error : ").append(exception.getMessage());
-	reportBuilder.append("\n");
+    reportBuilder.append(System.lineSeparator());
 	if (isNotEmpty(inputClasses)) {
 	  reportBuilder.append(INDENT).append("Given classes were : ").append(Arrays.toString(inputClasses));
-	  reportBuilder.append("\n");
+      reportBuilder.append(System.lineSeparator());
 	}
 	if (isNotEmpty(inputPackages)) {
 	  reportBuilder.append(INDENT).append("Given packages were : ").append(Arrays.toString(inputPackages));
-	  reportBuilder.append("\n");
+      reportBuilder.append(System.lineSeparator());
 	}
-	reportBuilder.append("\n");
+    reportBuilder.append(System.lineSeparator());
 	reportBuilder.append("Full error stack : ").append(getStackTrace(exception));
   }
 
   private void buildGeneratorParametersReport(StringBuilder reportBuilder) {
-	reportBuilder.append("\n");
-	reportBuilder.append(SECTION_START).append("Generator input parameters").append(SECTION_END).append("\n");
-	if (isNotEmpty(inputPackages)) {
-	  reportBuilder.append("Generating AssertJ assertions for classes in following packages and subpackages:\n");
-	  for (String inputPackage : inputPackages) {
-		reportBuilder.append(INDENT).append(inputPackage).append("\n");
+    reportBuilder.append(System.lineSeparator());
+    reportBuilder.append(SECTION_START).append("Generator input parameters").append(SECTION_END)
+                 .append(System.lineSeparator());
+    if (isNotEmpty(userTemplates)) {
+      reportBuilder.append("The following templates will replace the ones provided by AssertJ when generating AssertJ assertions :\n");
+      for (String inputPackage : userTemplates) {
+        reportBuilder.append(INDENT).append(inputPackage).append(System.lineSeparator());
 	  }
+      reportBuilder.append(System.lineSeparator());
 	}
+    if (isNotEmpty(inputPackages)) {
+      reportBuilder.append("Generating AssertJ assertions for classes in following packages and subpackages:\n");
+      for (String inputPackage : inputPackages) {
+        reportBuilder.append(INDENT).append(inputPackage).append(System.lineSeparator());
+      }
+    }
 	if (isNotEmpty(inputClasses)) {
 	  if (isNotEmpty(inputPackages)) {
-		reportBuilder.append("\n");
+        reportBuilder.append(System.lineSeparator());
 	  }
 	  reportBuilder.append("Generating AssertJ assertions for classes:\n");
 	  for (String inputClass : inputClasses) {
-		reportBuilder.append(INDENT).append(inputClass).append("\n");
+        reportBuilder.append(INDENT).append(inputClass).append(System.lineSeparator());
 	  }
 	}
 	if (isNotEmpty(excludedClassesFromAssertionGeneration)) {
-	  reportBuilder.append("\n");
+      reportBuilder.append(System.lineSeparator());
 	  reportBuilder.append("Input classes excluded from assertions generation:\n");
 	  for (Class<?> excludedClass : excludedClassesFromAssertionGeneration) {
-		reportBuilder.append(INDENT).append(excludedClass.getName()).append("\n");
+        reportBuilder.append(INDENT).append(excludedClass.getName()).append(System.lineSeparator());
 	  }
 	}
   }
@@ -212,5 +225,13 @@ public class AssertionsGeneratorReport {
 		inputClassesNotFound.add(inputClass);
 	  }
 	}
+  }
+
+  public void registerUserTemplate(String userTemplateDescription) {
+    userTemplates.add(userTemplateDescription);
+  }
+
+  public List<String> getUserTemplates() {
+    return userTemplates;
   }
 }

@@ -13,27 +13,24 @@
 package org.assertj.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.plugin.logging.Log;
 import org.assertj.assertions.generator.Template;
+import org.assertj.maven.generator.AssertionsGeneratorReport;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TemplatesTest {
 
-  private Log log;
+  private AssertionsGeneratorReport report;
   private Templates templates;
 
   @Before
   public void setup() {
     templates = new Templates();
-    log = mock(Log.class);
+    report = new AssertionsGeneratorReport();
   }
 
   @Test
@@ -43,10 +40,11 @@ public class TemplatesTest {
     String templateFilename = "my_has_assertion_template.txt";
     templates.templateDirectory = "target/test-classes/";
     // WHEN
-    templates.loadUserTemplate(templateFilename, Template.Type.HAS, "my has template", list, log);
+    templates.loadUserTemplate(templateFilename, Template.Type.HAS, "my has template", list, report);
     // THEN
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getContent()).isNotEmpty();
+    assertThat(report.getUserTemplates()).containsOnly("Using custom template for my has template loaded from target/test-classes/my_has_assertion_template.txt");
   }
 
   @Test
@@ -55,9 +53,9 @@ public class TemplatesTest {
     List<Template> list = new ArrayList<>();
     templates.templateDirectory = "target/test-classes/";
     // WHEN
-    templates.loadUserTemplate("unknown", Template.Type.HAS, "my has template", list, log);
+    templates.loadUserTemplate("unknown", Template.Type.HAS, "my has template", list, report);
     // THEN
     assertThat(list).isEmpty();
-    verify(log).warn(any(CharSequence.class));
+    assertThat(report.getUserTemplates()).containsOnly("Use default my has template assertion template as we failed to to read user template from target/test-classes/unknown");
   }
 }

@@ -96,9 +96,10 @@ public class AssertionsGenerator {
                                                          String entryPointFilePackage, boolean hierarchical,
                                                          Templates userTemplates) {
     generator.setDirectoryWhereAssertionFilesAreGenerated(destDir);
-    registerUserTemplates(userTemplates);
-    Set<ClassDescription> classDescriptions = new HashSet<ClassDescription>();
     AssertionsGeneratorReport report = new AssertionsGeneratorReport();
+    report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
+    registerUserTemplates(userTemplates, report);
+    Set<ClassDescription> classDescriptions = new HashSet<ClassDescription>();
     report.setInputPackages(inputPackages);
     report.setInputClasses(inputClassNames);
     try {
@@ -107,7 +108,6 @@ public class AssertionsGenerator {
       Set<Class<?>> filteredClasses = removeAssertClasses(classes);
       removeClassesAccordingToIncludeAndExcludePatterns(filteredClasses);
       report.setExcludedClassesFromAssertionGeneration(subtract(classes, filteredClasses));
-      report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
       if (hierarchical) {
         for (Class<?> clazz : filteredClasses) {
           ClassDescription classDescription = converter.convertToClassDescription(clazz);
@@ -138,9 +138,9 @@ public class AssertionsGenerator {
     return report;
   }
 
-  private void registerUserTemplates(Templates userTemplates) {
+  private void registerUserTemplates(Templates userTemplates, AssertionsGeneratorReport report) {
     if (userTemplates == null) return;
-    for (Template template : userTemplates.getTemplates(log)) {
+    for (Template template : userTemplates.getTemplates(report)) {
       generator.register(template);
     }
   }
