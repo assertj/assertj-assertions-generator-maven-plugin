@@ -22,11 +22,16 @@ import static org.assertj.assertions.generator.Template.Type.BDD_ASSERTIONS_ENTR
 import static org.assertj.assertions.generator.Template.Type.BDD_ENTRY_POINT_METHOD_ASSERTION;
 import static org.assertj.assertions.generator.Template.Type.HAS;
 import static org.assertj.assertions.generator.Template.Type.HAS_FOR_ARRAY;
+import static org.assertj.assertions.generator.Template.Type.HAS_FOR_CHAR;
+import static org.assertj.assertions.generator.Template.Type.HAS_FOR_CHARACTER;
 import static org.assertj.assertions.generator.Template.Type.HAS_FOR_ITERABLE;
-import static org.assertj.assertions.generator.Template.Type.HAS_FOR_PRIMITIVE;
 import static org.assertj.assertions.generator.Template.Type.HAS_FOR_REAL_NUMBER;
+import static org.assertj.assertions.generator.Template.Type.HAS_FOR_REAL_NUMBER_WRAPPER;
+import static org.assertj.assertions.generator.Template.Type.HAS_FOR_WHOLE_NUMBER;
+import static org.assertj.assertions.generator.Template.Type.HAS_FOR_WHOLE_NUMBER_WRAPPER;
 import static org.assertj.assertions.generator.Template.Type.HIERARCHICAL_ASSERT_CLASS;
 import static org.assertj.assertions.generator.Template.Type.IS;
+import static org.assertj.assertions.generator.Template.Type.IS_WRAPPER;
 import static org.assertj.assertions.generator.Template.Type.JUNIT_SOFT_ASSERTIONS_ENTRY_POINT_CLASS;
 import static org.assertj.assertions.generator.Template.Type.SOFT_ASSERTIONS_ENTRY_POINT_CLASS;
 import static org.assertj.assertions.generator.Template.Type.SOFT_ENTRY_POINT_METHOD_ASSERTION;
@@ -41,52 +46,62 @@ import org.assertj.maven.generator.AssertionsGeneratorReport;
 
 public class Templates {
 
-  public String templateDirectory;
+  public String templatesDirectory;
   // assertion class templates
-  public String assertionClassTemplate;
-  public String hierarchicalAssertionConcreteClassTemplate;
-  public String hierarchicalAssertionAbstractClassTemplate;
+  public String assertionClass;
+  public String hierarchicalAssertionConcreteClass;
+  public String hierarchicalAssertionAbstractClass;
   // assertion method templates
-  public String hasAssertionTemplate;
-  public String isAssertionTemplate;
-  public String arrayHasElementsAssertionTemplate;
-  public String iterableHasElementsAssertionTemplate;
-  public String primitiveHasAssertionTemplate;
-  public String realNumberHasAssertionTemplate;
+  public String objectAssertion;
+  public String booleanAssertion;
+  public String booleanWrapperAssertion;
+  public String arrayAssertion;
+  public String iterableAssertion;
+  public String charAssertion;
+  public String characterAssertion;
+  public String realNumberAssertion;
+  public String realNumberWrapperAssertion;
+  public String wholeNumberAssertion;
+  public String wholeNumberWrapperAssertion;
   // entry point templates
-  public String assertionsEntryPointClassTemplate;
-  public String assertionEntryPointMethodTemplate;
-  public String softEntryPointAssertionClassTemplate;
-  public String junitSoftEntryPointAssertionClassTemplate;
-  public String softEntryPointAssertionMethodTemplate;
-  public String bddEntryPointAssertionClassTemplate;
-  public String bddEntryPointAssertionMethodTemplate;
+  public String assertionsEntryPointClass;
+  public String assertionEntryPointMethod;
+  public String softEntryPointAssertionClass;
+  public String junitSoftEntryPointAssertionClass;
+  public String softEntryPointAssertionMethod;
+  public String bddEntryPointAssertionClass;
+  public String bddEntryPointAssertionMethod;
 
   public List<Template> getTemplates(AssertionsGeneratorReport report) {
     // resolve user templates directory
-    if (templateDirectory == null) templateDirectory = "./";
+    if (templatesDirectory == null) templatesDirectory = "./";
     // load any templates overridden by the user
     List<Template> userTemplates = new ArrayList<>();
     // @format:off
     // assertion class templates
-    loadUserTemplate(assertionClassTemplate, ASSERT_CLASS, "'class assertions'", userTemplates, report);
-    loadUserTemplate(hierarchicalAssertionConcreteClassTemplate, HIERARCHICAL_ASSERT_CLASS, "'hierarchical concrete class assertions'", userTemplates, report);
-    loadUserTemplate(hierarchicalAssertionAbstractClassTemplate, ABSTRACT_ASSERT_CLASS, "'hierarchical abstract class assertions'", userTemplates, report);
+    loadUserTemplate(assertionClass, ASSERT_CLASS, "'class assertions'", userTemplates, report);
+    loadUserTemplate(hierarchicalAssertionConcreteClass, HIERARCHICAL_ASSERT_CLASS, "'hierarchical concrete class assertions'", userTemplates, report);
+    loadUserTemplate(hierarchicalAssertionAbstractClass, ABSTRACT_ASSERT_CLASS, "'hierarchical abstract class assertions'", userTemplates, report);
     // assertion method templates
-    loadUserTemplate(hasAssertionTemplate, HAS, "'has assertions'", userTemplates, report);
-    loadUserTemplate(isAssertionTemplate, IS, "'is assertions'", userTemplates, report);
-    loadUserTemplate(arrayHasElementsAssertionTemplate, HAS_FOR_ARRAY, "'array has assertions'", userTemplates, report);
-    loadUserTemplate(iterableHasElementsAssertionTemplate, HAS_FOR_ITERABLE, "'iterable has assertions'", userTemplates, report);
-    loadUserTemplate(primitiveHasAssertionTemplate, HAS_FOR_PRIMITIVE, "'primitive type has assertions'", userTemplates, report);
-    loadUserTemplate(realNumberHasAssertionTemplate, HAS_FOR_REAL_NUMBER, "'real number has assertions'", userTemplates, report);
+    loadUserTemplate(objectAssertion, HAS, "'has assertions (Object)'", userTemplates, report);
+    loadUserTemplate(booleanAssertion, IS, "'is assertions (boolean)'", userTemplates, report);
+    loadUserTemplate(booleanWrapperAssertion, IS_WRAPPER, "'is wrapper assertions (Boolean)'", userTemplates, report);
+    loadUserTemplate(arrayAssertion, HAS_FOR_ARRAY, "'array has assertions'", userTemplates, report);
+    loadUserTemplate(iterableAssertion, HAS_FOR_ITERABLE, "'iterable has assertions'", userTemplates, report);
+    loadUserTemplate(realNumberAssertion, HAS_FOR_REAL_NUMBER, "'real number has assertions (float, double)'", userTemplates, report);
+    loadUserTemplate(realNumberWrapperAssertion, HAS_FOR_REAL_NUMBER_WRAPPER, "'real number wrapper has assertions (Float, Double)'", userTemplates, report);
+    loadUserTemplate(wholeNumberAssertion, HAS_FOR_WHOLE_NUMBER, "'real number has assertions (int, long, short, byte)'", userTemplates, report);
+    loadUserTemplate(wholeNumberWrapperAssertion, HAS_FOR_WHOLE_NUMBER_WRAPPER, "'real number has assertions (Integer, Long, Short, Byte)'", userTemplates, report);
+    loadUserTemplate(charAssertion, HAS_FOR_CHAR, "'char has assertions'", userTemplates, report);
+    loadUserTemplate(characterAssertion, HAS_FOR_CHARACTER, "'Character has assertions'", userTemplates, report);
     // entry point templates
-    loadUserTemplate(assertionsEntryPointClassTemplate,ASSERTIONS_ENTRY_POINT_CLASS, "'assertions entry point class'", userTemplates, report);
-    loadUserTemplate(assertionEntryPointMethodTemplate,ASSERTION_ENTRY_POINT,  "'assertions entry point method'", userTemplates, report);
-    loadUserTemplate(softEntryPointAssertionClassTemplate, SOFT_ASSERTIONS_ENTRY_POINT_CLASS, "'soft assertions entry point class'", userTemplates, report);
-    loadUserTemplate(junitSoftEntryPointAssertionClassTemplate, JUNIT_SOFT_ASSERTIONS_ENTRY_POINT_CLASS, "'junit soft assertions entry point class'", userTemplates, report);
-    loadUserTemplate(softEntryPointAssertionMethodTemplate, SOFT_ENTRY_POINT_METHOD_ASSERTION, "'soft assertions entry point method'", userTemplates, report);
-    loadUserTemplate(bddEntryPointAssertionClassTemplate, BDD_ASSERTIONS_ENTRY_POINT_CLASS, "'BDD assertions entry point class'", userTemplates, report);
-    loadUserTemplate(bddEntryPointAssertionMethodTemplate, BDD_ENTRY_POINT_METHOD_ASSERTION, "'BDD assertions entry point method'", userTemplates, report);
+    loadUserTemplate(assertionsEntryPointClass,ASSERTIONS_ENTRY_POINT_CLASS, "'assertions entry point class'", userTemplates, report);
+    loadUserTemplate(assertionEntryPointMethod,ASSERTION_ENTRY_POINT,  "'assertions entry point method'", userTemplates, report);
+    loadUserTemplate(softEntryPointAssertionClass, SOFT_ASSERTIONS_ENTRY_POINT_CLASS, "'soft assertions entry point class'", userTemplates, report);
+    loadUserTemplate(junitSoftEntryPointAssertionClass, JUNIT_SOFT_ASSERTIONS_ENTRY_POINT_CLASS, "'junit soft assertions entry point class'", userTemplates, report);
+    loadUserTemplate(softEntryPointAssertionMethod, SOFT_ENTRY_POINT_METHOD_ASSERTION, "'soft assertions entry point method'", userTemplates, report);
+    loadUserTemplate(bddEntryPointAssertionClass, BDD_ASSERTIONS_ENTRY_POINT_CLASS, "'BDD assertions entry point class'", userTemplates, report);
+    loadUserTemplate(bddEntryPointAssertionMethod, BDD_ENTRY_POINT_METHOD_ASSERTION, "'BDD assertions entry point method'", userTemplates, report);
     // @format:on
     return userTemplates;
   }
@@ -96,16 +111,16 @@ public class Templates {
                         List<Template> userTemplates, AssertionsGeneratorReport report) {
     if (userTemplate != null) {
       try {
-        File templateFile = new File(templateDirectory, userTemplate);
+        File templateFile = new File(templatesDirectory, userTemplate);
         String templateContent = readFileToString(templateFile, UTF_8);
         userTemplates.add(new Template(type, templateContent));
         report.registerUserTemplate("Using custom template for " + templateDescription + " loaded from "
-                                    + templateDirectory + userTemplate);
+                                    + templatesDirectory + userTemplate);
       } catch (Exception e) {
         // best effort : if we can't read user template, use the default one.
         report.registerUserTemplate("Use default " + templateDescription
-                 + " assertion template as we failed to to read user template from "
-                 + templateDirectory + userTemplate);
+                                    + " assertion template as we failed to to read user template from "
+                                    + templatesDirectory + userTemplate);
       }
     }
   }

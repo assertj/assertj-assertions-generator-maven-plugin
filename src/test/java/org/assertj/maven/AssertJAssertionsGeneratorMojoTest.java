@@ -99,8 +99,8 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test", "org.assertj.maven.test2");
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     assertjAssertionsGeneratorMojo.templates = new Templates();
-    assertjAssertionsGeneratorMojo.templates.templateDirectory = "src/test/resources/";
-    assertjAssertionsGeneratorMojo.templates.hasAssertionTemplate = "my_has_assertion_template.txt";
+    assertjAssertionsGeneratorMojo.templates.templatesDirectory = "src/test/resources/";
+    assertjAssertionsGeneratorMojo.templates.objectAssertion = "my_has_assertion_template.txt";
     List<String> classes = newArrayList(Employee.class.getName());
     when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 

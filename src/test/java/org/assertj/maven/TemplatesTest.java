@@ -38,7 +38,7 @@ public class TemplatesTest {
     // GIVEN
     List<Template> list = new ArrayList<>();
     String templateFilename = "my_has_assertion_template.txt";
-    templates.templateDirectory = "target/test-classes/";
+    templates.templatesDirectory = "target/test-classes/";
     // WHEN
     templates.loadUserTemplate(templateFilename, Template.Type.HAS, "my has template", list, report);
     // THEN
@@ -51,7 +51,7 @@ public class TemplatesTest {
   public void should_log_loading_failure_and_move_one() {
     // GIVEN
     List<Template> list = new ArrayList<>();
-    templates.templateDirectory = "target/test-classes/";
+    templates.templatesDirectory = "target/test-classes/";
     // WHEN
     templates.loadUserTemplate("unknown", Template.Type.HAS, "my has template", list, report);
     // THEN
