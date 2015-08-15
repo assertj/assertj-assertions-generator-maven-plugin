@@ -38,24 +38,24 @@ public class TemplatesTest {
     // GIVEN
     List<Template> list = new ArrayList<>();
     String templateFilename = "my_has_assertion_template.txt";
-    templates.templatesDirectory = "target/test-classes/";
+    templates.templatesDirectory = "target/test-classes/templates/";
     // WHEN
     templates.loadUserTemplate(templateFilename, Template.Type.HAS, "my has template", list, report);
     // THEN
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getContent()).isNotEmpty();
-    assertThat(report.getUserTemplates()).containsOnly("Using custom template for my has template loaded from target/test-classes/my_has_assertion_template.txt");
+    assertThat(report.getUserTemplates()).containsOnly("Using custom template for my has template loaded from target/test-classes/templates/my_has_assertion_template.txt");
   }
 
   @Test
   public void should_log_loading_failure_and_move_one() {
     // GIVEN
     List<Template> list = new ArrayList<>();
-    templates.templatesDirectory = "target/test-classes/";
+    templates.templatesDirectory = "target/test-classes/templates/";
     // WHEN
     templates.loadUserTemplate("unknown", Template.Type.HAS, "my has template", list, report);
     // THEN
     assertThat(list).isEmpty();
-    assertThat(report.getUserTemplates()).containsOnly("Use default my has template assertion template as we failed to to read user template from target/test-classes/unknown");
+    assertThat(report.getUserTemplates()).containsOnly("Use default my has template assertion template as we failed to to read user template from target/test-classes/templates/unknown");
   }
 }

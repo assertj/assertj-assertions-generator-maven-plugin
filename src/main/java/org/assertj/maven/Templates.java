@@ -75,6 +75,7 @@ public class Templates {
   public List<Template> getTemplates(AssertionsGeneratorReport report) {
     // resolve user templates directory
     if (templatesDirectory == null) templatesDirectory = "./";
+    if (!templatesDirectory.endsWith("/")) templatesDirectory += "/";
     // load any templates overridden by the user
     List<Template> userTemplates = new ArrayList<>();
     // @format:off
@@ -83,17 +84,17 @@ public class Templates {
     loadUserTemplate(hierarchicalAssertionConcreteClass, HIERARCHICAL_ASSERT_CLASS, "'hierarchical concrete class assertions'", userTemplates, report);
     loadUserTemplate(hierarchicalAssertionAbstractClass, ABSTRACT_ASSERT_CLASS, "'hierarchical abstract class assertions'", userTemplates, report);
     // assertion method templates
-    loadUserTemplate(objectAssertion, HAS, "'has assertions (Object)'", userTemplates, report);
-    loadUserTemplate(booleanAssertion, IS, "'is assertions (boolean)'", userTemplates, report);
-    loadUserTemplate(booleanWrapperAssertion, IS_WRAPPER, "'is wrapper assertions (Boolean)'", userTemplates, report);
-    loadUserTemplate(arrayAssertion, HAS_FOR_ARRAY, "'array has assertions'", userTemplates, report);
-    loadUserTemplate(iterableAssertion, HAS_FOR_ITERABLE, "'iterable has assertions'", userTemplates, report);
-    loadUserTemplate(realNumberAssertion, HAS_FOR_REAL_NUMBER, "'real number has assertions (float, double)'", userTemplates, report);
-    loadUserTemplate(realNumberWrapperAssertion, HAS_FOR_REAL_NUMBER_WRAPPER, "'real number wrapper has assertions (Float, Double)'", userTemplates, report);
-    loadUserTemplate(wholeNumberAssertion, HAS_FOR_WHOLE_NUMBER, "'real number has assertions (int, long, short, byte)'", userTemplates, report);
-    loadUserTemplate(wholeNumberWrapperAssertion, HAS_FOR_WHOLE_NUMBER_WRAPPER, "'real number has assertions (Integer, Long, Short, Byte)'", userTemplates, report);
-    loadUserTemplate(charAssertion, HAS_FOR_CHAR, "'char has assertions'", userTemplates, report);
-    loadUserTemplate(characterAssertion, HAS_FOR_CHARACTER, "'Character has assertions'", userTemplates, report);
+    loadUserTemplate(objectAssertion, HAS, "'object assertions'", userTemplates, report);
+    loadUserTemplate(booleanAssertion, IS, "'boolean assertions'", userTemplates, report);
+    loadUserTemplate(booleanWrapperAssertion, IS_WRAPPER, "'boolean wrapper assertions'", userTemplates, report);
+    loadUserTemplate(arrayAssertion, HAS_FOR_ARRAY, "'array assertions'", userTemplates, report);
+    loadUserTemplate(iterableAssertion, HAS_FOR_ITERABLE, "'iterable assertions'", userTemplates, report);
+    loadUserTemplate(realNumberAssertion, HAS_FOR_REAL_NUMBER, "'real number assertions (float, double)'", userTemplates, report);
+    loadUserTemplate(realNumberWrapperAssertion, HAS_FOR_REAL_NUMBER_WRAPPER, "'real number wrapper assertions (Float, Double)'", userTemplates, report);
+    loadUserTemplate(wholeNumberAssertion, HAS_FOR_WHOLE_NUMBER, "'whole number assertions (int, long, short, byte)'", userTemplates, report);
+    loadUserTemplate(wholeNumberWrapperAssertion, HAS_FOR_WHOLE_NUMBER_WRAPPER, "'whole number has assertions (Integer, Long, Short, Byte)'", userTemplates, report);
+    loadUserTemplate(charAssertion, HAS_FOR_CHAR, "'char assertions'", userTemplates, report);
+    loadUserTemplate(characterAssertion, HAS_FOR_CHARACTER, "'Character assertions'", userTemplates, report);
     // entry point templates
     loadUserTemplate(assertionsEntryPointClass,ASSERTIONS_ENTRY_POINT_CLASS, "'assertions entry point class'", userTemplates, report);
     loadUserTemplate(assertionEntryPointMethod,ASSERTION_ENTRY_POINT,  "'assertions entry point method'", userTemplates, report);

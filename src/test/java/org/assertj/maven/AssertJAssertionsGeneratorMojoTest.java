@@ -32,6 +32,7 @@ import org.assertj.assertions.generator.BaseAssertionGenerator;
 import org.assertj.assertions.generator.description.ClassDescription;
 import org.assertj.maven.generator.AssertionsGenerator;
 import org.assertj.maven.generator.AssertionsGeneratorReport;
+import org.assertj.maven.test.All;
 import org.assertj.maven.test.Employee;
 import org.assertj.maven.test.name.Name;
 import org.assertj.maven.test.name.NameService;
@@ -72,7 +73,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(assertionsEntryPointFile("Assertions.java")).exists();
     assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
     assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
-  } 
+  }
 
   @Test
   public void executing_plugin_with_hierarchical_option_should_generate_hierarchical_assertions() throws Exception {
@@ -96,23 +97,61 @@ public class AssertJAssertionsGeneratorMojoTest {
 
   @Test
   public void should_generate_assertions_with_user_templates() throws Exception {
-    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test", "org.assertj.maven.test2");
-    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    // GIVEN
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.All");
     assertjAssertionsGeneratorMojo.templates = new Templates();
-    assertjAssertionsGeneratorMojo.templates.templatesDirectory = "src/test/resources/";
+    assertjAssertionsGeneratorMojo.templates.templatesDirectory = "src/test/resources/templates/";
     assertjAssertionsGeneratorMojo.templates.objectAssertion = "my_has_assertion_template.txt";
-    List<String> classes = newArrayList(Employee.class.getName());
+    assertjAssertionsGeneratorMojo.templates.bddEntryPointAssertionMethod = "my_bdd_assertion_entry_point_method_template.txt";
+    assertjAssertionsGeneratorMojo.templates.bddEntryPointAssertionClass = "my_bdd_assertions_entry_point_class_template.txt";
+    assertjAssertionsGeneratorMojo.templates.hierarchicalAssertionAbstractClass = "my_custom_abstract_assertion_class_template.txt";
+    assertjAssertionsGeneratorMojo.templates.assertionClass = "my_custom_assertion_class_template.txt";
+    assertjAssertionsGeneratorMojo.templates.hierarchicalAssertionConcreteClass = "my_custom_hierarchical_assertion_class_template.txt";
+    assertjAssertionsGeneratorMojo.templates.characterAssertion = "my_has_assertion_template_for_character.txt";
+    assertjAssertionsGeneratorMojo.templates.charAssertion = "my_has_assertion_template_for_char.txt";
+    assertjAssertionsGeneratorMojo.templates.realNumberAssertion = "my_has_assertion_template_for_real_number.txt";
+    assertjAssertionsGeneratorMojo.templates.realNumberWrapperAssertion = "my_has_assertion_template_for_real_number_wrapper.txt";
+    assertjAssertionsGeneratorMojo.templates.wholeNumberAssertion = "my_has_assertion_template_for_whole_number.txt";
+    assertjAssertionsGeneratorMojo.templates.wholeNumberWrapperAssertion = "my_has_assertion_template_for_whole_number_wrapper.txt";
+    assertjAssertionsGeneratorMojo.templates.arrayAssertion = "my_has_elements_assertion_template_for_array.txt";
+    assertjAssertionsGeneratorMojo.templates.iterableAssertion = "my_has_elements_assertion_template_for_iterable.txt";
+    assertjAssertionsGeneratorMojo.templates.booleanAssertion = "my_is_assertion_template.txt";
+    assertjAssertionsGeneratorMojo.templates.booleanWrapperAssertion = "my_is_wrapper_assertion_template.txt";
+    assertjAssertionsGeneratorMojo.templates.junitSoftEntryPointAssertionClass = "my_junit_soft_assertions_entry_point_class_template.txt";
+    assertjAssertionsGeneratorMojo.templates.softEntryPointAssertionMethod = "my_soft_assertion_entry_point_method_template.txt";
+    assertjAssertionsGeneratorMojo.templates.softEntryPointAssertionClass = "my_soft_assertions_entry_point_class_template.txt";
+    assertjAssertionsGeneratorMojo.templates.assertionEntryPointMethod = "my_standard_assertion_entry_point_method_template.txt";
+    assertjAssertionsGeneratorMojo.templates.assertionsEntryPointClass = "my_standard_assertions_entry_point_class_template.txt";
+    List<String> classes = newArrayList(All.class.getName());
     when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 
+    // WHEN
     assertjAssertionsGeneratorMojo.execute();
 
     // check that expected assertions file exist (we don't check the content we suppose the generator works).
-    File employeeAssertFile = assertionsFileFor(Employee.class);
-    assertThat(employeeAssertFile).exists();
-    assertThat(contentOf(employeeAssertFile)).contains("System.out.println");
-    assertThat(assertionsEntryPointFile("Assertions.java")).exists();
-    assertThat(assertionsEntryPointFile("BddAssertions.java")).exists();
-    assertThat(assertionsEntryPointFile("SoftAssertions.java")).exists();
+    File allAssertFile = assertionsFileFor(All.class);
+    assertThat(allAssertFile).exists();
+    // check that its content was done using custom templates
+    assertThat(contentOf(allAssertFile)).contains("my_custom_assertion_class_template",
+                                                  "my_has_assertion_template_for_character",
+                                                  "my_has_assertion_template_for_char",
+                                                  "my_has_assertion_template_for_real_number",
+                                                  "my_has_assertion_template_for_real_number_wrapper",
+                                                  "my_has_assertion_template_for_whole_number",
+                                                  "my_has_assertion_template_for_whole_number_wrapper",
+                                                  "my_has_assertion_template",
+                                                  "my_has_elements_assertion_template_for_array",
+                                                  "my_has_elements_assertion_template_for_iterable",
+                                                  "my_is_assertion_template",
+                                                  "my_is_wrapper_assertion_template");
+
+    assertThat(contentOf(assertionsEntryPointFile("Assertions.java"))).contains("my_standard_assertion_entry_point_method_template",
+                                                                                "my_standard_assertions_entry_point_class_template");
+    assertThat(contentOf(assertionsEntryPointFile("BddAssertions.java"))).contains("my_bdd_assertion_entry_point_method_template",
+                                                                                   "my_bdd_assertions_entry_point_class_template");
+    assertThat(contentOf(assertionsEntryPointFile("SoftAssertions.java"))).contains("my_soft_assertion_entry_point_method_template",
+                                                                                    "my_soft_assertions_entry_point_class_template");
+    assertThat(contentOf(assertionsEntryPointFile("JUnitSoftAssertions.java"))).contains("my_junit_soft_assertions_entry_point_class_template");
   }
 
   @Test
@@ -131,7 +170,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.execute();
     assertThat(assertionsFileFor("org.assertj.maven.test.MyAssertionsAssert")).doesNotExist();
   }
-  
+
   @Test
   public void executing_plugin_with_classes_parameter_only_should_pass() throws Exception {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee",
@@ -172,7 +211,7 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.generateBddAssertions = false;
     assertjAssertionsGeneratorMojo.generateSoftAssertions = false;
     assertjAssertionsGeneratorMojo.generateJUnitSoftAssertions = false;
-    
+
     assertjAssertionsGeneratorMojo.execute();
 
     // check that expected assertions file exist (we don't check the content we suppose the generator works).
@@ -226,28 +265,28 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.excludes = array(".*Employee", ".*Service");
     List<String> classes = newArrayList(Employee.class.getName(), Name.class.getName());
     when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
-    
+
     assertjAssertionsGeneratorMojo.execute();
-    
+
     assertThat(assertionsFileFor(Name.class)).exists();
     assertThat(assertionsFileFor(NameService.class)).doesNotExist();
     assertThat(assertionsFileFor(Employee.class)).doesNotExist();
   }
-  
+
   @Test
   public void plugin_should_not_generate_any_assertions_as_all_package_classes_are_excluded() throws Exception {
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test");
     assertjAssertionsGeneratorMojo.excludes = array(".*Employ..", ".*Name.*");
     List<String> classes = newArrayList(Employee.class.getName(), Name.class.getName());
     when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
-    
+
     assertjAssertionsGeneratorMojo.execute();
-    
+
     assertThat(assertionsFileFor(Name.class)).doesNotExist();
     assertThat(assertionsFileFor(NameService.class)).doesNotExist();
     assertThat(assertionsFileFor(Employee.class)).doesNotExist();
   }
-  
+
   @Test
   public void plugin_should_not_generate_assertions_for_classes_matching_both_include_and_exclude_pattern() throws Exception {
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test");
@@ -255,14 +294,14 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.excludes = array(".*Employee", ".*Service");
     List<String> classes = newArrayList(Employee.class.getName(), Name.class.getName());
     when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
-    
+
     assertjAssertionsGeneratorMojo.execute();
-    
+
     assertThat(assertionsFileFor(Name.class)).exists();
     assertThat(assertionsFileFor(NameService.class)).doesNotExist();
     assertThat(assertionsFileFor(Employee.class)).doesNotExist();
   }
-  
+
   @SuppressWarnings("unchecked")
   @Test
   public void executing_plugin_with_error_should_be_reported_in_generator_report() throws Exception {
@@ -281,17 +320,17 @@ public class AssertJAssertionsGeneratorMojoTest {
 
   @Test
   public void input_classes_not_found_should_be_listed_in_generator_report() throws Exception {
-	assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee", "org.Foo", "org.Bar");
-	when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(Employee.class.getName()));
-	AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
-	
-	AssertionsGeneratorReport report = assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
-	
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee", "org.Foo", "org.Bar");
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(Employee.class.getName()));
+    AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
+
+    AssertionsGeneratorReport report = assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
+
     // check that expected assertions file exist (we don't check the content we suppose the generator works).
     assertThat(assertionsFileFor(Employee.class)).exists();
     assertThat(report.getInputClassesNotFound()).as("check report").containsExactly("org.Bar", "org.Foo");
   }
-  
+
   @Test
   public void should_fail_if_packages_and_classes_parameters_are_null() throws Exception {
     try {
@@ -302,15 +341,15 @@ public class AssertJAssertionsGeneratorMojoTest {
     }
   }
 
-  private File assertionsFileFor(Class<?> clazz) throws IOException {
+  private File assertionsFileFor(Class<?> clazz) {
     return new File(temporaryFolder.getRoot(), basePathName(clazz) + "Assert.java");
   }
 
-  private File assertionsFileFor(String className) throws IOException {
+  private File assertionsFileFor(String className) {
     return new File(temporaryFolder.getRoot(), className.replace('.', File.separatorChar) + ".java");
   }
 
-  private File abstractAssertionsFileFor(Class<?> clazz) throws IOException {
+  private File abstractAssertionsFileFor(Class<?> clazz) {
     return new File(temporaryFolder.getRoot(), basePathName("Abstract", clazz) + "Assert.java");
   }
 
@@ -323,12 +362,12 @@ public class AssertJAssertionsGeneratorMojoTest {
            + clazz.getSimpleName();
   }
 
-  private File assertionsEntryPointFile(String simpleName) throws IOException {
+  private File assertionsEntryPointFile(String simpleName) {
     return new File(temporaryFolder.getRoot(), "org.assertj.maven.test".replace('.', File.separatorChar)
                                                + File.separator + simpleName);
   }
 
-  private File assertionsEntryPointFileWithCustomPackage() throws IOException {
+  private File assertionsEntryPointFileWithCustomPackage() {
     return new File(temporaryFolder.getRoot(), "my.custom.pkg".replace('.', File.separatorChar) + File.separator
                                                + "Assertions.java");
   }
