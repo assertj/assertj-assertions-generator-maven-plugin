@@ -12,8 +12,7 @@
  */
 package org.assertj.maven;
 
-import static org.apache.commons.io.Charsets.UTF_8;
-import static org.apache.commons.io.FileUtils.readFileToString;
+import static com.google.common.io.Closeables.closeQuietly;
 import static org.assertj.assertions.generator.Template.Type.ABSTRACT_ASSERT_CLASS;
 import static org.assertj.assertions.generator.Template.Type.ASSERTIONS_ENTRY_POINT_CLASS;
 import static org.assertj.assertions.generator.Template.Type.ASSERTION_ENTRY_POINT;
@@ -37,12 +36,20 @@ import static org.assertj.assertions.generator.Template.Type.SOFT_ASSERTIONS_ENT
 import static org.assertj.assertions.generator.Template.Type.SOFT_ENTRY_POINT_METHOD_ASSERTION;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.CharEncoding;
 import org.assertj.assertions.generator.Template;
+import org.assertj.core.util.Files;
 import org.assertj.core.util.VisibleForTesting;
 import org.assertj.maven.generator.AssertionsGeneratorReport;
+
+import com.google.common.io.CharStreams;
 
 public class Templates {
 
@@ -113,11 +120,11 @@ public class Templates {
     if (userTemplate != null) {
       try {
         File templateFile = new File(templatesDirectory, userTemplate);
-        String templateContent = readFileToString(templateFile, UTF_8);
+        String templateContent = Files.contentOf(templateFile, CharEncoding.UTF_8);
         userTemplates.add(new Template(type, templateContent));
         report.registerUserTemplate("Using custom template for " + templateDescription + " loaded from "
                                     + templatesDirectory + userTemplate);
-      } catch (Exception e) {
+      } catch (@SuppressWarnings("unused") Exception e) {
         // best effort : if we can't read user template, use the default one.
         report.registerUserTemplate("Use default " + templateDescription
                                     + " assertion template as we failed to to read user template from "
