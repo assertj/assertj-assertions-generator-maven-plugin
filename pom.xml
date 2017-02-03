@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>2.0.1-SNAPSHOT</version>
+  <version>2.1.1-JE-Patched</version>
   <name>Maven plugin for AssertJ assertions generator</name>
 
   <parent>
@@ -34,14 +34,14 @@
             <goals>
               <goal>descriptor</goal>
             </goals>
-        </execution>
-        <execution>
+          </execution>
+          <execution>
             <id>help-goal</id>
             <goals>
               <goal>helpmojo</goal>
             </goals>
-        </execution>
-      </executions>
+          </execution>
+        </executions>
       </plugin>
       <!-- generate jacoco report -->
       <plugin>
@@ -49,7 +49,7 @@
         <artifactId>jacoco-maven-plugin</artifactId>
         <configuration>
           <excludes>
-              <exclude>org/assertj/maven/HelpMojo.class</exclude>
+            <exclude>org/assertj/maven/HelpMojo.class</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -82,7 +82,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore />
+                    <ignore/>
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -110,6 +110,11 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
       <version>3.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.5</version>
     </dependency>
 
     <!-- maven plugin dependencies -->
