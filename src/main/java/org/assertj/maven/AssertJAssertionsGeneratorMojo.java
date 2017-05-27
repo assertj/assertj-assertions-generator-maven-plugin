@@ -91,7 +91,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   /**
    * Flag specifying whether to generate hierarchical assertions. The default is false.
    */
-  @Parameter(defaultValue = "false", property = "assertj.hierarchical")
+  @Parameter(defaultValue = "true", property = "assertj.hierarchical")
   public boolean hierarchical;
 
   /**
