@@ -16,6 +16,8 @@ import static com.google.common.base.Charsets.UTF_8;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.write;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.TEST;
 import static org.assertj.assertions.generator.AssertionsEntryPointType.*;
@@ -72,6 +74,18 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
    */
   @Parameter(defaultValue = "false", property = "assertj.cleanTargetDir")
   public boolean cleanTargetDir;
+
+  /**
+   * The scope of generates sources ('test' or 'compile') to be added to the maven build. <br>
+   * Expected to be used in conjunction with {@link #targetDir}, for example:
+   * <pre>{@code
+   *  <targetDir>${project.build.directory}/generated-sources/assertj-assertions</targetDir>
+   *  <generatedSourcesScope>compile</generatedSourcesScope>
+   * }</pre>
+   * Defaults to 'test'.<br>
+   */
+  @Parameter(defaultValue = "test", property = "assertj.generatedSourcesScope")
+  public String generatedSourcesScope;
 
   /**
    * List of packages to generate assertions for.
@@ -212,7 +226,9 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
                                                                                          entryPointClassPackage,
                                                                                          hierarchical, templates);
     printReport(generatorReport);
-    project.addTestCompileSourceRoot(targetDir);
+	if (isEmpty(generatedSourcesScope) || equalsIgnoreCase("test", generatedSourcesScope)) project.addTestCompileSourceRoot(targetDir);
+	else if (equalsIgnoreCase("compile", generatedSourcesScope)) project.addCompileSourceRoot(targetDir);
+	else getLog().warn(format("Unknown generated sources scope '%s' - no sources added to project", generatedSourcesScope));
     return generatorReport;
   }
 

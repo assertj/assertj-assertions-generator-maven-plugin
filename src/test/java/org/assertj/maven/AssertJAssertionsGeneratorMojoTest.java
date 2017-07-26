@@ -21,6 +21,8 @@ import static org.assertj.core.util.Lists.newArrayList;
 import static org.assertj.maven.AssertJAssertionsGeneratorMojo.shouldHaveNonEmptyPackagesOrClasses;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -391,6 +393,66 @@ public class AssertJAssertionsGeneratorMojoTest {
     File reportFile = new File(reportFilename);
     assertThat(reportFile).exists();
     assertThat(contentOf(reportFile)).contains("EmployeeAssert");
+  }
+
+  public void executing_plugin_with_default_target_scope_should_pass() throws Exception {
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.entryPointClassPackage = "my.custom.pkg";
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+
+    assertjAssertionsGeneratorMojo.execute();
+
+    assertThat(assertionsFileFor(Employee.class)).exists();
+    assertThat(assertionsEntryPointFileWithCustomPackage()).exists();
+    verify(mavenProject).addTestCompileSourceRoot(assertjAssertionsGeneratorMojo.targetDir);
+  }
+
+  @Test
+  public void executing_plugin_with_test_target_scope_should_pass() throws Exception {
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.entryPointClassPackage = "my.custom.pkg";
+    assertjAssertionsGeneratorMojo.generatedSourcesScope = "test";
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+
+    assertjAssertionsGeneratorMojo.execute();
+
+    assertThat(assertionsFileFor(Employee.class)).exists();
+    assertThat(assertionsEntryPointFileWithCustomPackage()).exists();
+    verify(mavenProject).addTestCompileSourceRoot(assertjAssertionsGeneratorMojo.targetDir);
+  }
+
+  @Test
+  public void executing_plugin_with_compile_target_scope_should_pass() throws Exception {
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.entryPointClassPackage = "my.custom.pkg";
+    assertjAssertionsGeneratorMojo.generatedSourcesScope = "compile";
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+
+    assertjAssertionsGeneratorMojo.execute();
+
+    assertThat(assertionsFileFor(Employee.class)).exists();
+    assertThat(assertionsEntryPointFileWithCustomPackage()).exists();
+    verify(mavenProject).addCompileSourceRoot(assertjAssertionsGeneratorMojo.targetDir);
+  }
+
+
+  @Test
+  public void executing_plugin_with_invalid_target_scope_should_pass() throws Exception {
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.entryPointClassPackage = "my.custom.pkg";
+    assertjAssertionsGeneratorMojo.generatedSourcesScope = "invalid";
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+
+    assertjAssertionsGeneratorMojo.execute();
+
+    assertThat(assertionsFileFor(Employee.class)).exists();
+    assertThat(assertionsEntryPointFileWithCustomPackage()).exists();
+    verify(mavenProject, never()).addCompileSourceRoot(assertjAssertionsGeneratorMojo.targetDir);
+    verify(mavenProject, never()).addTestCompileSourceRoot(assertjAssertionsGeneratorMojo.targetDir);
   }
 
   private File assertionsFileFor(Class<?> clazz) {
