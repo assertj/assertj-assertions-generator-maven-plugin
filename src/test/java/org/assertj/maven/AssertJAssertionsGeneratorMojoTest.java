@@ -361,7 +361,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   public void executing_plugin_with_test_target_scope_should_pass() throws Exception {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     assertjAssertionsGeneratorMojo.entryPointClassPackage = "my.custom.pkg";
-    assertjAssertionsGeneratorMojo.targetScope = "test";
+    assertjAssertionsGeneratorMojo.generatedSourcesScope = "test";
     List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
     when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 
@@ -376,7 +376,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   public void executing_plugin_with_compile_target_scope_should_pass() throws Exception {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     assertjAssertionsGeneratorMojo.entryPointClassPackage = "my.custom.pkg";
-    assertjAssertionsGeneratorMojo.targetScope = "compile";
+    assertjAssertionsGeneratorMojo.generatedSourcesScope = "compile";
     List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
     when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 
@@ -392,7 +392,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   public void executing_plugin_with_invalid_target_scope_should_pass() throws Exception {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
     assertjAssertionsGeneratorMojo.entryPointClassPackage = "my.custom.pkg";
-    assertjAssertionsGeneratorMojo.targetScope = "invalid";
+    assertjAssertionsGeneratorMojo.generatedSourcesScope = "invalid";
     List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
     when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
 

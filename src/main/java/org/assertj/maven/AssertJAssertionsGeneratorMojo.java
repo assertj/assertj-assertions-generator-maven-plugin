@@ -69,12 +69,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
    * Expected to be used in conjunction with {@link #targetDir}, for example:
    * <pre>{@code
    *  <targetDir>${project.build.directory}/generated-sources/assertj-assertions</targetDir>
-   *  <targetScope>compile</targetScope>
+   *  <generatedSourcesScope>compile</generatedSourcesScope>
    * }</pre>
    * Defaults to 'test'.<br>
    */
-  @Parameter(defaultValue = "test", property = "assertj.targetType")
-  public String targetScope;
+  @Parameter(defaultValue = "test", property = "assertj.generatedSourcesScope")
+  public String generatedSourcesScope;
 
   /**
    * List of packages to generate assertions for.
@@ -184,9 +184,9 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
                                                                                          entryPointClassPackage,
                                                                                          hierarchical, templates);
 	getLog().info(generatorReport.getReportContent());
-	if (isEmpty(targetScope) || equalsIgnoreCase("test", targetScope)) project.addTestCompileSourceRoot(targetDir);
-	else if (equalsIgnoreCase("compile", targetScope)) project.addCompileSourceRoot(targetDir);
-	else getLog().warn(format("Unknown target scope '%s' - no sources added to project", targetScope));
+	if (isEmpty(generatedSourcesScope) || equalsIgnoreCase("test", generatedSourcesScope)) project.addTestCompileSourceRoot(targetDir);
+	else if (equalsIgnoreCase("compile", generatedSourcesScope)) project.addCompileSourceRoot(targetDir);
+	else getLog().warn(format("Unknown generated sources scope '%s' - no sources added to project", generatedSourcesScope));
 	return generatorReport;
   }
 
