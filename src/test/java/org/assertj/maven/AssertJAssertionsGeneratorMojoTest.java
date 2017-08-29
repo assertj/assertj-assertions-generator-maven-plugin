@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.contentOf;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.assertj.core.util.Arrays.array;
+import static org.assertj.core.util.Files.newFile;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.assertj.maven.AssertJAssertionsGeneratorMojo.shouldHaveNonEmptyPackagesOrClasses;
 import static org.mockito.Matchers.any;
@@ -30,6 +31,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.assertj.assertions.generator.BaseAssertionGenerator;
 import org.assertj.assertions.generator.description.ClassDescription;
+import org.assertj.core.util.Files;
 import org.assertj.maven.generator.AssertionsGenerator;
 import org.assertj.maven.generator.AssertionsGeneratorReport;
 import org.assertj.maven.test.All;
@@ -339,6 +341,18 @@ public class AssertJAssertionsGeneratorMojoTest {
     } catch (MojoFailureException e) {
       assertThat(e).hasMessage(shouldHaveNonEmptyPackagesOrClasses());
     }
+  }
+
+  @Test
+  public void shoud_clean_previously_generated_assertions_before_generating_new_ones() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test.Employee");
+    File shouldBeDeleted = newFile(assertjAssertionsGeneratorMojo.targetDir + "/should-be-deleted");
+    assertThat(shouldBeDeleted).exists();
+    // WHEN
+    assertjAssertionsGeneratorMojo.execute();
+    // THEN
+    assertThat(shouldBeDeleted).doesNotExist();
   }
 
   private File assertionsFileFor(Class<?> clazz) {
