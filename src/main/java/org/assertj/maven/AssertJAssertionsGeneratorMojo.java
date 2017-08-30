@@ -36,6 +36,7 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -52,6 +53,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   private static final String[] INCLUDE_ALL_CLASSES = { ".*" };
 
+  private static final NoLog NO_LOG = new NoLog();
   /**
    * Current maven project
    */
@@ -142,6 +144,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public boolean generateSoftAssertions = true;
 
   /**
+   * Do not log anything if true, false by default.
+   */
+  @Parameter(property = "assertj.quiet")
+  public boolean quiet = false;
+
+  /**
    * Generate generating Soft Assertions entry point class.
    */
   @Parameter(property = "assertj.templates")
@@ -173,6 +181,14 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage(), e);
     }
+  }
+
+  @Override
+  public Log getLog() {
+    if (quiet) {
+      return NO_LOG;
+    }
+    return super.getLog();
   }
 
   private void cleanPreviouslyGeneratedSources() {

@@ -368,6 +368,16 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(shouldStillExist).exists();
   }
 
+  @Test
+  public void shoud_not_log_anything() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test.Employee");
+    // WHEN
+    assertjAssertionsGeneratorMojo.quiet = true;
+    // THEN
+    assertjAssertionsGeneratorMojo.execute();
+  }
+
   private File assertionsFileFor(Class<?> clazz) {
     return new File(temporaryFolder.getRoot(), basePathName(clazz) + "Assert.java");
   }
