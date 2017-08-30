@@ -347,12 +347,25 @@ public class AssertJAssertionsGeneratorMojoTest {
   public void shoud_clean_previously_generated_assertions_before_generating_new_ones() throws Exception {
     // GIVEN
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.cleanTargetDir = true;
     File shouldBeDeleted = newFile(assertjAssertionsGeneratorMojo.targetDir + "/should-be-deleted");
     assertThat(shouldBeDeleted).exists();
     // WHEN
     assertjAssertionsGeneratorMojo.execute();
     // THEN
     assertThat(shouldBeDeleted).doesNotExist();
+  }
+
+  @Test
+  public void shoud_not_clean_previously_generated_assertions_by_default() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test.Employee");
+    File shouldStillExist = newFile(assertjAssertionsGeneratorMojo.targetDir + "/should-still-exist");
+    assertThat(shouldStillExist).exists();
+    // WHEN
+    assertjAssertionsGeneratorMojo.execute();
+    // THEN
+    assertThat(shouldStillExist).exists();
   }
 
   private File assertionsFileFor(Class<?> clazz) {

@@ -67,6 +67,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public String targetDir;
 
   /**
+   * Flag specifying whether to clean the directory where assertions are generated. The default is false.
+   */
+  @Parameter(defaultValue = "false", property = "assertj.cleanTargetDir")
+  public boolean cleanTargetDir;
+
+  /**
    * List of packages to generate assertions for.
    */
   @Parameter(property = "assertj.packages")
@@ -162,7 +168,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
           getLog().info("JUnit not found in project classpath => JUnitSoftAssertions entry point class won't be generated.");
       }
       assertionGenerator.setLog(getLog());
-      cleanPreviouslyGeneratedSources();
+      if (cleanTargetDir) cleanPreviouslyGeneratedSources();
       executeWithAssertionGenerator(assertionGenerator);
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage(), e);
