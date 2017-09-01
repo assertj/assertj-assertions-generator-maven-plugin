@@ -13,6 +13,7 @@
 package org.assertj.maven;
 
 import static java.lang.String.format;
+import static org.apache.commons.io.FileUtils.write;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.TEST;
@@ -150,6 +151,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public boolean quiet = false;
 
   /**
+   * The generated assertions report is written to the given file, if given a relative path the root path is where the plugin is executed.
+   */
+  @Parameter(property = "assertj.writeReportInFile")
+  public String writeReportInFile;
+
+  /**
    * Generate generating Soft Assertions entry point class.
    */
   @Parameter(property = "assertj.templates")
@@ -185,10 +192,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   @Override
   public Log getLog() {
-    if (quiet) {
-      return NO_LOG;
-    }
-    return super.getLog();
+    return quiet ? NO_LOG : super.getLog();
   }
 
   private void cleanPreviouslyGeneratedSources() {
@@ -209,9 +213,31 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
                                                                                          entryPointClassPackage,
                                                                                          hierarchical, templates);
-    getLog().info(generatorReport.getReportContent());
+    printReport(generatorReport);
     project.addTestCompileSourceRoot(targetDir);
     return generatorReport;
+  }
+
+  private void printReport(AssertionsGeneratorReport assertionsGeneratorReport) {
+    String reportContent = assertionsGeneratorReport.getReportContent();
+    if (shouldWriteReportInFile()) {
+      writeReportInFile(reportContent);
+    } else {
+      getLog().info(reportContent);
+    }
+  }
+
+  private void writeReportInFile(String reportContent) {
+    try {
+      write(new File(writeReportInFile), reportContent);
+    } catch (IOException e) {
+      getLog().warn("Failed to write the assertions generation assertionsGeneratorReport in file "
+                    + writeReportInFile, e);
+    }
+  }
+
+  private boolean shouldWriteReportInFile() {
+    return writeReportInFile != null;
   }
 
   private void failIfMojoParametersAreMissing() throws MojoFailureException {

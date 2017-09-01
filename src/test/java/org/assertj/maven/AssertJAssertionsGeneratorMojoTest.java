@@ -344,7 +344,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   @Test
-  public void shoud_clean_previously_generated_assertions_before_generating_new_ones() throws Exception {
+  public void should_clean_previously_generated_assertions_before_generating_new_ones() throws Exception {
     // GIVEN
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test.Employee");
     assertjAssertionsGeneratorMojo.cleanTargetDir = true;
@@ -357,7 +357,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   @Test
-  public void shoud_not_clean_previously_generated_assertions_by_default() throws Exception {
+  public void should_not_clean_previously_generated_assertions_by_default() throws Exception {
     // GIVEN
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test.Employee");
     File shouldStillExist = newFile(assertjAssertionsGeneratorMojo.targetDir + "/should-still-exist");
@@ -369,13 +369,28 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   @Test
-  public void shoud_not_log_anything() throws Exception {
+  public void should_not_log_anything() throws Exception {
     // GIVEN
     assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test.Employee");
     // WHEN
     assertjAssertionsGeneratorMojo.quiet = true;
-    // THEN
     assertjAssertionsGeneratorMojo.execute();
+    // THEN
+    // no logs should be produced
+  }
+
+  @Test
+  public void should_write_report_to_file() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.packages = array("org.assertj.maven.test.Employee");
+    String reportFilename = "target/reportFilename";
+    assertjAssertionsGeneratorMojo.writeReportInFile = reportFilename;
+    // WHEN
+    assertjAssertionsGeneratorMojo.execute();
+    // THEN
+    File reportFile = new File(reportFilename);
+    assertThat(reportFile).exists();
+    assertThat(contentOf(reportFile)).contains("EmployeeAssert");
   }
 
   private File assertionsFileFor(Class<?> clazz) {
