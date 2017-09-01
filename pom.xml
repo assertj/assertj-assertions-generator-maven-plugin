@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>2.0.0</version>
+  <version>2.1.0-SNAPSHOT</version>
   <name>Maven plugin for AssertJ assertions generator</name>
 
   <parent>
@@ -50,6 +50,7 @@
         <configuration>
           <excludes>
               <exclude>org/assertj/maven/HelpMojo.class</exclude>
+              <exclude>org/assertj/maven/NoLog.class</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -99,7 +100,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-assertions-generator</artifactId>
-      <version>${project.version}</version>
+      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
