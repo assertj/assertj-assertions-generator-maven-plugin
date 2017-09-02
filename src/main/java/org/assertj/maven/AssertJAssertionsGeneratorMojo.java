@@ -198,7 +198,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   private void cleanPreviouslyGeneratedSources() {
     try {
       Path targetDirPath = Paths.get(targetDir);
-      if (Files.exists(targetDirPath) && Files.list(targetDirPath).count() > 0) {
+      if (Files.exists(targetDirPath) && targetDirPath.toFile().list().length > 0) {
         getLog().info("Removing previously generated sources in " + targetDir);
         FileUtils.cleanDirectory(targetDirPath.toFile());
       }
