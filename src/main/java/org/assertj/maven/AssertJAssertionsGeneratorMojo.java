@@ -221,6 +221,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   private void printReport(AssertionsGeneratorReport assertionsGeneratorReport) {
     String reportContent = assertionsGeneratorReport.getReportContent();
     if (shouldWriteReportInFile()) {
+      getLog().info("Writing the assertions generator report in file: " + writeReportInFile);
       writeReportInFile(reportContent);
     } else {
       getLog().info(reportContent);
