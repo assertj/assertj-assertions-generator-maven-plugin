@@ -20,13 +20,13 @@ import static org.assertj.core.util.Arrays.isNullOrEmpty;
 import static org.assertj.core.util.Sets.newHashSet;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.google.common.reflect.TypeToken;
 import org.apache.maven.plugin.logging.Log;
 import org.assertj.assertions.generator.AssertionsEntryPointType;
 import org.assertj.assertions.generator.BaseAssertionGenerator;
@@ -50,7 +50,7 @@ public class AssertionsGenerator {
   private Log log;
   private Set<AssertionsEntryPointType> assertionsEntryPointToGenerate;
 
-  public AssertionsGenerator(ClassLoader classLoader) throws FileNotFoundException, IOException {
+  public AssertionsGenerator(ClassLoader classLoader) throws IOException {
     this.generator = new BaseAssertionGenerator();
     this.converter = new ClassToClassDescriptionConverter();
     this.classLoader = classLoader;
@@ -95,21 +95,21 @@ public class AssertionsGenerator {
                                                          String destDir,
                                                          String entryPointFilePackage, boolean hierarchical,
                                                          Templates userTemplates) {
-    generator.setDirectoryWhereAssertionFilesAreGenerated(destDir);
+    generator.setDirectoryWhereAssertionFilesAreGenerated(new File(destDir));
     AssertionsGeneratorReport report = new AssertionsGeneratorReport();
     report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
     registerUserTemplates(userTemplates, report);
-    Set<ClassDescription> classDescriptions = new HashSet<ClassDescription>();
+    Set<ClassDescription> classDescriptions = new HashSet<>();
     report.setInputPackages(inputPackages);
     report.setInputClasses(inputClassNames);
     try {
-      Set<Class<?>> classes = collectClasses(classLoader, addAll(inputPackages, inputClassNames));
+      Set<TypeToken<?>> classes = collectClasses(classLoader, addAll(inputPackages, inputClassNames));
       report.reportInputClassesNotFound(classes, inputClassNames);
-      Set<Class<?>> filteredClasses = removeAssertClasses(classes);
+      Set<TypeToken<?>> filteredClasses = removeAssertClasses(classes);
       removeClassesAccordingToIncludeAndExcludePatterns(filteredClasses);
       report.setExcludedClassesFromAssertionGeneration(subtract(classes, filteredClasses));
       if (hierarchical) {
-        for (Class<?> clazz : filteredClasses) {
+        for (TypeToken<?> clazz : filteredClasses) {
           ClassDescription classDescription = converter.convertToClassDescription(clazz);
           File[] generatedCustomAssertionFiles = generator.generateHierarchicalCustomAssertionFor(classDescription,
                                                                                                   filteredClasses);
@@ -118,7 +118,7 @@ public class AssertionsGenerator {
           classDescriptions.add(classDescription);
         }
       } else {
-        for (Class<?> clazz : filteredClasses) {
+        for (TypeToken<?> clazz : filteredClasses) {
           ClassDescription classDescription = converter.convertToClassDescription(clazz);
           File generatedCustomAssertionFile = generator.generateCustomAssertionFor(classDescription);
           report.addGeneratedAssertionFile(generatedCustomAssertionFile);
@@ -145,15 +145,15 @@ public class AssertionsGenerator {
     }
   }
 
-  private void removeClassesAccordingToIncludeAndExcludePatterns(Set<Class<?>> filteredClasses) {
-    for (Iterator<Class<?>> it = filteredClasses.iterator(); it.hasNext();) {
-      Class<?> element = it.next();
+  private void removeClassesAccordingToIncludeAndExcludePatterns(Set<TypeToken<?>> filteredClasses) {
+    for (Iterator<TypeToken<?>> it = filteredClasses.iterator(); it.hasNext();) {
+      TypeToken<?> element = it.next();
       if (!isIncluded(element) || isExcluded(element)) it.remove();
     }
   }
 
-  private boolean isIncluded(Class<?> element) {
-    String className = element.getName();
+  private boolean isIncluded(TypeToken<?> element) {
+    String className = element.getRawType().getName();
     for (Pattern includePattern : includePatterns) {
       if (includePattern.matcher(className).matches()) return true;
     }
@@ -161,8 +161,8 @@ public class AssertionsGenerator {
     return false;
   }
 
-  private boolean isExcluded(Class<?> element) {
-    String className = element.getName();
+  private boolean isExcluded(TypeToken<?> element) {
+    String className = element.getRawType().getName();
     for (Pattern excludePattern : excludePatterns) {
       if (excludePattern.matcher(className).matches()) {
         log.debug("Won't generate assertions for " + className + " as it matches exclude regex : " + excludePattern);
@@ -172,10 +172,10 @@ public class AssertionsGenerator {
     return false;
   }
 
-  private Set<Class<?>> removeAssertClasses(Set<Class<?>> classList) {
-    Set<Class<?>> filteredClassList = newLinkedHashSet();
-    for (Class<?> clazz : classList) {
-      String classSimpleName = clazz.getSimpleName();
+  private Set<TypeToken<?>> removeAssertClasses(Set<TypeToken<?>> classList) {
+    Set<TypeToken<?>> filteredClassList = newLinkedHashSet();
+    for (TypeToken<?> clazz : classList) {
+      String classSimpleName = clazz.getRawType().getSimpleName();
       if (!classSimpleName.endsWith("Assert") && !classSimpleName.endsWith("Assertions")) {
         filteredClassList.add(clazz);
       }

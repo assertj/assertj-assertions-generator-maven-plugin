@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.reflect.TypeToken;
 import org.assertj.assertions.generator.AssertionsEntryPointType;
 
 public class AssertionsGeneratorReport {
@@ -41,7 +42,7 @@ public class AssertionsGeneratorReport {
   private String[] inputPackages;
   private String[] inputClasses;
   private Exception exception;
-  private Collection<Class<?>> excludedClassesFromAssertionGeneration;
+  private Collection<TypeToken<?>> excludedClassesFromAssertionGeneration;
   private Set<String> inputClassesNotFound;
   private List<String> userTemplates;
 
@@ -172,8 +173,8 @@ public class AssertionsGeneratorReport {
 	if (isNotEmpty(excludedClassesFromAssertionGeneration)) {
       reportBuilder.append(System.lineSeparator());
 	  reportBuilder.append("Input classes excluded from assertions generation:\n");
-	  for (Class<?> excludedClass : excludedClassesFromAssertionGeneration) {
-        reportBuilder.append(INDENT).append(excludedClass.getName()).append(System.lineSeparator());
+	  for (TypeToken<?> excludedClass : excludedClassesFromAssertionGeneration) {
+        reportBuilder.append(INDENT).append(excludedClass.getRawType().getName()).append(System.lineSeparator());
 	  }
 	}
   }
@@ -207,7 +208,7 @@ public class AssertionsGeneratorReport {
 	return exception;
   }
 
-  public void setExcludedClassesFromAssertionGeneration(Collection<Class<?>> excludedClassSet) {
+  public void setExcludedClassesFromAssertionGeneration(Collection<TypeToken<?>> excludedClassSet) {
 	this.excludedClassesFromAssertionGeneration = excludedClassSet;
   }
 
@@ -215,10 +216,10 @@ public class AssertionsGeneratorReport {
 	return inputClassesNotFound;
   }
 
-  public void reportInputClassesNotFound(Set<Class<?>> classes, String[] inputClassNames) {
+  public void reportInputClassesNotFound(Set<TypeToken<?>> classes, String[] inputClassNames) {
 	Set<String> classesFound = newTreeSet();
-	for (Class<?> clazz : classes) {
-	  classesFound.add(clazz.getName());
+	for (TypeToken<?> clazz : classes) {
+	  classesFound.add(clazz.getRawType().getName());
 	}
 	for (String inputClass : inputClassNames) {
 	  if (!classesFound.contains(inputClass)) {

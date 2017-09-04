@@ -12,15 +12,13 @@
  */
 package org.assertj.maven;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.write;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.TEST;
-import static org.assertj.assertions.generator.AssertionsEntryPointType.BDD;
-import static org.assertj.assertions.generator.AssertionsEntryPointType.JUNIT_SOFT;
-import static org.assertj.assertions.generator.AssertionsEntryPointType.SOFT;
-import static org.assertj.assertions.generator.AssertionsEntryPointType.STANDARD;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -230,7 +228,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   private void writeReportInFile(String reportContent) {
     try {
-      write(new File(writeReportInFile), reportContent);
+      write(new File(writeReportInFile), reportContent, UTF_8);
     } catch (IOException e) {
       getLog().warn("Failed to write the assertions generation assertionsGeneratorReport in file "
                     + writeReportInFile, e);
@@ -251,9 +249,9 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   private ClassLoader getProjectClassLoader() throws DependencyResolutionRequiredException, MalformedURLException {
     List<String> classpathElements = new ArrayList<String>(project.getCompileClasspathElements());
     classpathElements.addAll(project.getTestClasspathElements());
-    List<URL> classpathElementUrls = new ArrayList<URL>(classpathElements.size());
-    for (int i = 0; i < classpathElements.size(); i++) {
-      classpathElementUrls.add(new File(classpathElements.get(i)).toURI().toURL());
+    List<URL> classpathElementUrls = new ArrayList<>(classpathElements.size());
+    for (String classpathElement : classpathElements) {
+      classpathElementUrls.add(new File(classpathElement).toURI().toURL());
     }
     return new URLClassLoader(classpathElementUrls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
   }
