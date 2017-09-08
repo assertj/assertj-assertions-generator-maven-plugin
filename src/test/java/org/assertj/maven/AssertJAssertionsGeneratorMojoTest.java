@@ -37,6 +37,7 @@ import org.assertj.maven.generator.AssertionsGenerator;
 import org.assertj.maven.generator.AssertionsGeneratorReport;
 import org.assertj.maven.test.All;
 import org.assertj.maven.test.Employee;
+import org.assertj.maven.test.Player;
 import org.assertj.maven.test.name.Name;
 import org.assertj.maven.test.name.NameService;
 import org.assertj.maven.test2.adress.Address;
@@ -260,6 +261,22 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertThat(assertionsFileFor(Name.class)).exists();
     assertThat(assertionsFileFor(NameService.class)).doesNotExist();
     assertThat(assertionsFileFor(Employee.class)).doesNotExist();
+  }
+
+  @Test
+  public void plugin_should_generate_assertions_for_all_fields() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Player");
+    assertjAssertionsGeneratorMojo.generateAssertionsForAllFields = true;
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(Player.class.getName()));
+
+    // WHEN
+    assertjAssertionsGeneratorMojo.execute();
+
+    // THEN
+    File playerAssertFile = assertionsFileFor(Player.class);
+    assertThat(playerAssertFile).exists();
+    assertThat(contentOf(playerAssertFile)).contains("hasSalary", "hasTeam", "hasName", "isRookie");
   }
 
   @Test

@@ -92,9 +92,8 @@ public class AssertionsGenerator {
    */
   @SuppressWarnings("unchecked")
   public AssertionsGeneratorReport generateAssertionsFor(String[] inputPackages, String[] inputClassNames,
-                                                         String destDir,
-                                                         String entryPointFilePackage, boolean hierarchical,
-                                                         Templates userTemplates) {
+                                                         String destDir, String entryPointFilePackage,
+                                                         boolean hierarchical, Templates userTemplates) {
     generator.setDirectoryWhereAssertionFilesAreGenerated(new File(destDir));
     AssertionsGeneratorReport report = new AssertionsGeneratorReport();
     report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
@@ -196,4 +195,7 @@ public class AssertionsGenerator {
     this.assertionsEntryPointToGenerate.add(type);
   }
 
+  public void generateAssertionsForAllFields(boolean generateAssertionsForAllFields) {
+    this.generator.setGenerateAssertionsForAllFields(generateAssertionsForAllFields);
+  }
 }

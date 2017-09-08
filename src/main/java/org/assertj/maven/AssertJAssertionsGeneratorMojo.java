@@ -107,7 +107,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public String[] includes = INCLUDE_ALL_CLASSES;
 
   /**
-   * If class macthes one of the given regex, no assertions will be generated for it, default is not to exclude
+   * If class matches one of the given regex, no assertions will be generated for it, default is not to exclude
    * anything.
    */
   @Parameter(property = "assertj.excludes")
@@ -118,6 +118,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
    */
   @Parameter(defaultValue = "true", property = "assertj.hierarchical")
   public boolean hierarchical;
+
+  /**
+   * Flag specifying whether to generate assertions for all fields (including non public ones). The default is false.
+   */
+  @Parameter(defaultValue = "false", property = "assertj.generateAssertionsForAllFields")
+  public boolean generateAssertionsForAllFields;
 
   /**
    * An optional package name for the Assertions entry point class. If omitted, the package will be determined
@@ -184,6 +190,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     try {
       ClassLoader projectClassLoader = getProjectClassLoader();
       AssertionsGenerator assertionGenerator = new AssertionsGenerator(projectClassLoader);
+      assertionGenerator.generateAssertionsForAllFields(this.generateAssertionsForAllFields);
       assertionGenerator.setIncludePatterns(includes);
       assertionGenerator.setExcludePatterns(excludes);
       if (generateAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(STANDARD);
