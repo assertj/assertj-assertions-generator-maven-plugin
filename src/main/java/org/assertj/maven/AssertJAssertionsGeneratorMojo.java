@@ -70,6 +70,18 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public String targetDir;
 
   /**
+   * Package where generated assertion classes will reside. 
+   * <p/>
+   * If not set (or set to empty), each assertion class is generated in the package of the corresponding class to assert.
+   * For example the generated assertion class for com.nba.Player will be com.nba.PlayerAssert (in the same package as Player). 
+   * Defaults to ''.<br>
+   * <p/>
+   * Note that the Assertions entry point classes package is controlled by the entryPointClassPackage property.
+   */
+  @Parameter(defaultValue = "", property = "assertj.generateAssertionsInPackage")
+  public String generateAssertionsInPackage;
+
+  /**
    * Flag specifying whether to clean the directory where assertions are generated. The default is false.
    */
   @Parameter(defaultValue = "false", property = "assertj.cleanTargetDir")
@@ -202,6 +214,10 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
           getLog().info("JUnit not found in project classpath => JUnitSoftAssertions entry point class won't be generated.");
       }
       assertionGenerator.setLog(getLog());
+      if (generateAssertionsInPackage != null) {
+        // user has set generateAssertionsInPackage  (not that maven converts empty string param to null) 
+        assertionGenerator.setGeneratedAssertionsPackage(generateAssertionsInPackage);
+      }
       if (cleanTargetDir) cleanPreviouslyGeneratedSources();
       executeWithAssertionGenerator(assertionGenerator);
     } catch (Exception e) {

@@ -159,7 +159,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   @Test
-  public void shoud_not_generate_assertions_for_assert_classes() throws Exception {
+  public void should_not_generate_assertions_for_assert_classes() throws Exception {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.MyAssert");
     assertjAssertionsGeneratorMojo.packages = array("some.package");
     assertjAssertionsGeneratorMojo.hierarchical = true;
@@ -168,7 +168,7 @@ public class AssertJAssertionsGeneratorMojoTest {
   }
 
   @Test
-  public void shoud_not_generate_assertions_for_assertions_classes() throws Exception {
+  public void should_not_generate_assertions_for_assertions_classes() throws Exception {
     assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.MyAssertions");
     assertjAssertionsGeneratorMojo.packages = array("some.package");
     assertjAssertionsGeneratorMojo.execute();
@@ -277,6 +277,22 @@ public class AssertJAssertionsGeneratorMojoTest {
     File playerAssertFile = assertionsFileFor(Player.class);
     assertThat(playerAssertFile).exists();
     assertThat(contentOf(playerAssertFile)).contains("hasSalary", "hasTeam", "hasName", "isRookie");
+  }
+
+  @Test
+  public void plugin_should_generate_assertions_in_given_package() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Player");
+    assertjAssertionsGeneratorMojo.generateAssertionsInPackage = "my.assertions";
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(Player.class.getName()));
+
+    // WHEN
+    assertjAssertionsGeneratorMojo.execute();
+
+    // THEN
+    File playerAssertFile = new File(temporaryFolder.getRoot(), "my/assertions/PlayerAssert.java");
+    assertThat(playerAssertFile).exists();
+    assertThat(contentOf(playerAssertFile)).contains("package my.assertions");
   }
 
   @Test

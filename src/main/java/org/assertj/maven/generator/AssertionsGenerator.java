@@ -198,4 +198,8 @@ public class AssertionsGenerator {
   public void generateAssertionsForAllFields(boolean generateAssertionsForAllFields) {
     this.generator.setGenerateAssertionsForAllFields(generateAssertionsForAllFields);
   }
+
+  public void setGeneratedAssertionsPackage(String generateAssertionsInPackage) {
+    this.generator.setGeneratedAssertionsPackage(generateAssertionsInPackage);
+  }
 }
