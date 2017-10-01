@@ -249,9 +249,9 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
                                                                                          entryPointClassPackage,
                                                                                          hierarchical, templates);
     printReport(generatorReport);
-	if (isEmpty(generatedSourcesScope) || equalsIgnoreCase("test", generatedSourcesScope)) project.addTestCompileSourceRoot(targetDir);
-	else if (equalsIgnoreCase("compile", generatedSourcesScope)) project.addCompileSourceRoot(targetDir);
-	else getLog().warn(format("Unknown generated sources scope '%s' - no sources added to project", generatedSourcesScope));
+    if (isEmpty(generatedSourcesScope) || equalsIgnoreCase("test", generatedSourcesScope)) project.addTestCompileSourceRoot(targetDir);
+    else if (equalsIgnoreCase("compile", generatedSourcesScope)) project.addCompileSourceRoot(targetDir);
+    else getLog().warn(format("Unknown generated sources scope '%s' - no sources added to project", generatedSourcesScope));
     return generatorReport;
   }
 
@@ -297,7 +297,8 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
 
   @VisibleForTesting
   static String shouldHaveNonEmptyPackagesOrClasses() {
-    return format("Parameter 'packages' or 'classes' must be set to generate assertions.%n[Help] https://github.com/joel-costigliola/assertj-assertions-generator-maven-plugin");
+    return format(
+        "Parameter 'packages' or 'classes' must be set to generate assertions.%n[Help] https://github.com/joel-costigliola/assertj-assertions-generator-maven-plugin");
   }
 
   private boolean junitFoundBy(ClassLoader projectClassLoader) {
