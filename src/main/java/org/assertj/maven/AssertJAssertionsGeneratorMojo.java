@@ -70,10 +70,10 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public String targetDir;
 
   /**
-   * Package where generated assertion classes will reside. 
+   * Package where generated assertion classes will reside.
    * <p/>
    * If not set (or set to empty), each assertion class is generated in the package of the corresponding class to assert.
-   * For example the generated assertion class for com.nba.Player will be com.nba.PlayerAssert (in the same package as Player). 
+   * For example the generated assertion class for com.nba.Player will be com.nba.PlayerAssert (in the same package as Player).
    * Defaults to ''.<br>
    * <p/>
    * Note that the Assertions entry point classes package is controlled by the entryPointClassPackage property.
@@ -192,6 +192,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @Parameter(property = "assertj.templates")
   public Templates templates;
 
+  /**
+   * Generate assertions for package private classes if true
+   */
+  @Parameter(property = "assertj.includePackagePrivateClasses")
+  public boolean includePackagePrivateClasses = false;
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     if (skip) {
@@ -215,7 +221,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
       }
       assertionGenerator.setLog(getLog());
       if (generateAssertionsInPackage != null) {
-        // user has set generateAssertionsInPackage  (not that maven converts empty string param to null) 
+        // user has set generateAssertionsInPackage  (not that maven converts empty string param to null)
         assertionGenerator.setGeneratedAssertionsPackage(generateAssertionsInPackage);
       }
       if (cleanTargetDir) cleanPreviouslyGeneratedSources();
@@ -246,8 +252,8 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   AssertionsGeneratorReport executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) {
     if (classes == null) classes = new String[0];
     AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
-                                                                                         entryPointClassPackage,
-                                                                                         hierarchical, templates);
+                                                                                         entryPointClassPackage, hierarchical,
+                                                                                         templates, includePackagePrivateClasses);
     printReport(generatorReport);
     if (isEmpty(generatedSourcesScope) || equalsIgnoreCase("test", generatedSourcesScope)) project.addTestCompileSourceRoot(targetDir);
     else if (equalsIgnoreCase("compile", generatedSourcesScope)) project.addCompileSourceRoot(targetDir);

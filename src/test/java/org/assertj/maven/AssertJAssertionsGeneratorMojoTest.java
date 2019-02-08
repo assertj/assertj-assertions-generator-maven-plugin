@@ -491,6 +491,31 @@ public class AssertJAssertionsGeneratorMojoTest {
     verify(mavenProject, never()).addTestCompileSourceRoot(assertjAssertionsGeneratorMojo.targetDir);
   }
 
+  @Test
+  public void plugin_should_generate_assertions_for_included_package_private_classes_when_option_enabled() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.PackagePrivate");
+    assertjAssertionsGeneratorMojo.includePackagePrivateClasses = true;
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(PackagePrivate.class.getName()));
+    AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
+    // WHEN
+    assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
+    // THEN
+    assertThat(assertionsFileFor(PackagePrivate.class)).exists();
+  }
+
+  @Test
+  public void plugin_should_not_generate_assertions_for_included_package_private_classes_by_default() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.PackagePrivate");
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(PackagePrivate.class.getName()));
+    AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
+    // WHEN
+    assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
+    // THEN
+    assertThat(assertionsFileFor(PackagePrivate.class)).doesNotExist();
+  }
+
   private File assertionsFileFor(Class<?> clazz) {
     return new File(temporaryFolder.getRoot(), basePathName(clazz) + "Assert.java");
   }
