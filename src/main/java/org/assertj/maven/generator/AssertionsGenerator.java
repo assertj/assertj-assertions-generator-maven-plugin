@@ -83,17 +83,18 @@ public class AssertionsGenerator {
   /**
    * Generates custom assertions for classes in given packages with the Assertions class entry point in given
    * destination dir.
-   * 
+   *
    * @param inputPackages the packages containing the classes we want to generate Assert classes for.
    * @param inputClassNames the packages containing the classes we want to generate Assert classes for.
    * @param destDir the base directory where the classes are going to be generated.
    * @param entryPointFilePackage the package of the assertions entry point class, may be <code>null</code>.
+   * @param includePackagePrivateClasses collect package private classes if true.
    * @throws IOException if the files can't be generated
    */
   @SuppressWarnings("unchecked")
   public AssertionsGeneratorReport generateAssertionsFor(String[] inputPackages, String[] inputClassNames,
-                                                         String destDir, String entryPointFilePackage,
-                                                         boolean hierarchical, Templates userTemplates) {
+                                                         String destDir, String entryPointFilePackage, boolean hierarchical,
+                                                         Templates userTemplates, boolean includePackagePrivateClasses) {
     generator.setDirectoryWhereAssertionFilesAreGenerated(new File(destDir));
     AssertionsGeneratorReport report = new AssertionsGeneratorReport();
     report.setDirectoryPathWhereAssertionFilesAreGenerated(destDir);
@@ -102,7 +103,7 @@ public class AssertionsGenerator {
     report.setInputPackages(inputPackages);
     report.setInputClasses(inputClassNames);
     try {
-      Set<TypeToken<?>> classes = collectClasses(classLoader, addAll(inputPackages, inputClassNames));
+      Set<TypeToken<?>> classes = collectClasses(classLoader, includePackagePrivateClasses, addAll(inputPackages, inputClassNames));
       report.reportInputClassesNotFound(classes, inputClassNames);
       Set<TypeToken<?>> filteredClasses = removeAssertClasses(classes);
       removeClassesAccordingToIncludeAndExcludePatterns(filteredClasses);
