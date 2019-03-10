@@ -110,8 +110,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-assertions-generator</artifactId>
-      <!-- try to have the same version but might not be possible if we release the plugin without generator changes -->
-      <version>${project.version}</version>
+      <version>2.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
