@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>2.2.0-SNAPSHOT</version>
+  <version>2.2.0</version>
   <name>Maven plugin for AssertJ assertions generator</name>
 
   <parent>
@@ -16,7 +15,7 @@
     <developerConnection>scm:git:git@github.com:joel-costigliola/assertj-assertions-generator-maven-plugin.git</developerConnection>
     <connection>scm:git:git@github.com:joel-costigliola/assertj-assertions-generator-maven-plugin.git</connection>
     <url>git@github.com:joel-costigliola/assertj-assertions-generator-maven-plugin</url>
-    <tag>HEAD</tag>
+    <tag>assertj-assertions-generator-maven-plugin-2.2.0</tag>
   </scm>
 
   <build>
