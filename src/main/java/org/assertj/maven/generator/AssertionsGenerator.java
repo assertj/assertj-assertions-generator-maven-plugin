@@ -102,8 +102,9 @@ public class AssertionsGenerator {
     Set<ClassDescription> classDescriptions = new HashSet<>();
     report.setInputPackages(inputPackages);
     report.setInputClasses(inputClassNames);
+    final String[] resolvedPackages = new PackagesResolver(classLoader, inputPackages, log).getPackages();
     try {
-      Set<TypeToken<?>> classes = collectClasses(classLoader, includePackagePrivateClasses, addAll(inputPackages, inputClassNames));
+      Set<TypeToken<?>> classes = collectClasses(classLoader, includePackagePrivateClasses, addAll(resolvedPackages, inputClassNames));
       report.reportInputClassesNotFound(classes, inputClassNames);
       Set<TypeToken<?>> filteredClasses = removeAssertClasses(classes);
       removeClassesAccordingToIncludeAndExcludePatterns(filteredClasses);
