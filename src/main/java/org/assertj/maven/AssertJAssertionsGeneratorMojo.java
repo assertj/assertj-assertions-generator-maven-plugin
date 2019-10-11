@@ -20,7 +20,10 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.TEST;
-import static org.assertj.assertions.generator.AssertionsEntryPointType.*;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.BDD;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.JUNIT_SOFT;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.SOFT;
+import static org.assertj.assertions.generator.AssertionsEntryPointType.STANDARD;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +36,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -198,6 +202,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @Parameter(property = "assertj.includePackagePrivateClasses")
   public boolean includePackagePrivateClasses = false;
 
+  /**
+   * Don't crash the mojo if a class cannot be loaded owing to linkage error.
+   */
+  @Parameter(defaultValue = "false", property = "assertj.silent")
+  public boolean silent;
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     if (skip) {
@@ -234,6 +244,47 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @Override
   public Log getLog() {
     return quiet ? NO_LOG : super.getLog();
+  }
+
+  @VisibleForTesting
+  protected ClassLoader getProjectClassLoader() throws DependencyResolutionRequiredException, MalformedURLException {
+    List<String> classpathElements = new ArrayList<String>(project.getCompileClasspathElements());
+    classpathElements.addAll(project.getTestClasspathElements());
+    List<URL> classpathElementUrls = new ArrayList<>(classpathElements.size());
+    for (String classpathElement : classpathElements) {
+      classpathElementUrls.add(new File(classpathElement).toURI().toURL());
+    }
+    return new URLClassLoader(classpathElementUrls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader()) {
+      @Override
+      public Class<?> loadClass(String name) throws ClassNotFoundException {
+        try {
+          return loadClass(name, false);
+        } catch (ClassNotFoundException | NoClassDefFoundError cnfe) {
+          if (silent && isClass(name)) {
+            return Object.class;
+          }
+
+          throw cnfe;
+        }
+      }
+
+      @Override
+      protected Class<?> findClass(final String name) throws ClassNotFoundException {
+        try {
+          return super.findClass(name);
+        } catch (ClassNotFoundException | NoClassDefFoundError cnfe) {
+          if (silent && isClass(name)) {
+            return Object.class;
+          }
+
+          throw cnfe;
+        }
+      }
+
+      protected boolean isClass(String name) {
+        return StringUtils.containsAny(name, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+      }
+    };
   }
 
   private void cleanPreviouslyGeneratedSources() {
@@ -288,17 +339,6 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     if (isEmpty(packages) && isEmpty(classes)) {
       throw new MojoFailureException(shouldHaveNonEmptyPackagesOrClasses());
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private ClassLoader getProjectClassLoader() throws DependencyResolutionRequiredException, MalformedURLException {
-    List<String> classpathElements = new ArrayList<String>(project.getCompileClasspathElements());
-    classpathElements.addAll(project.getTestClasspathElements());
-    List<URL> classpathElementUrls = new ArrayList<>(classpathElements.size());
-    for (String classpathElement : classpathElements) {
-      classpathElementUrls.add(new File(classpathElement).toURI().toURL());
-    }
-    return new URLClassLoader(classpathElementUrls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
   }
 
   @VisibleForTesting

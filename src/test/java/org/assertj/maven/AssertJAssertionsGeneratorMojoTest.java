@@ -19,7 +19,7 @@ import static org.assertj.core.util.Arrays.array;
 import static org.assertj.core.util.Files.newFile;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.assertj.maven.AssertJAssertionsGeneratorMojo.shouldHaveNonEmptyPackagesOrClasses;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -514,6 +514,46 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
     // THEN
     assertThat(assertionsFileFor(PackagePrivate.class)).doesNotExist();
+  }
+
+  @Test
+  public void should_dont_crash_if_silent_option_enabled_and_errors_detected_to_load_classes() throws Exception {
+    assertjAssertionsGeneratorMojo.silent = true;
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+    ClassLoader classloader = assertjAssertionsGeneratorMojo.getProjectClassLoader();
+    assertThat(classloader).isNotNull();
+    assertThat(classloader.loadClass("fr.mycompany.InexistingClass")).isInstanceOf(Object.class);
+  }
+
+  @Test(expected = ClassNotFoundException.class)
+  public void should_crash_if_silent_option_disabled_and_errors_detected_to_load_classes() throws Exception {
+    assertjAssertionsGeneratorMojo.silent = false;
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+    ClassLoader classloader = assertjAssertionsGeneratorMojo.getProjectClassLoader();
+    assertThat(classloader).isNotNull();
+    classloader.loadClass("fr.mycompany.InexistingClass");
+  }
+
+  @Test(expected = ClassNotFoundException.class)
+  public void should_throws_class_not_found_exception_if_silent_option_enabled_and_errors_detected_to_load_packages() throws Exception {
+    assertjAssertionsGeneratorMojo.silent = true;
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+    ClassLoader classloader = assertjAssertionsGeneratorMojo.getProjectClassLoader();
+    assertThat(classloader).isNotNull();
+    classloader.loadClass("fr.mycompany");
+  }
+
+  @Test(expected = ClassNotFoundException.class)
+  public void should_throws_class_not_found_exception_if_silent_option_disabled_and_errors_detected_to_load_packages() throws Exception {
+    assertjAssertionsGeneratorMojo.silent = false;
+    List<String> classes = newArrayList(Employee.class.getName(), Address.class.getName());
+    when(mavenProject.getCompileClasspathElements()).thenReturn(classes);
+    ClassLoader classloader = assertjAssertionsGeneratorMojo.getProjectClassLoader();
+    assertThat(classloader).isNotNull();
+    classloader.loadClass("fr.mycompany");
   }
 
   private File assertionsFileFor(Class<?> clazz) {
