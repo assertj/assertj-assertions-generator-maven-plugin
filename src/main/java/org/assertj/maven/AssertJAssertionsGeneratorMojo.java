@@ -198,6 +198,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @Parameter(property = "assertj.includePackagePrivateClasses")
   public boolean includePackagePrivateClasses = false;
 
+  /**
+   * Fail the build if the generation of one or more assertion classes fails. Defaults to {@code false}.
+   */
+  @Parameter(property = "assertj.failOnError")
+  public boolean failOnError = false;
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     if (skip) {
@@ -226,6 +232,8 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
       }
       if (cleanTargetDir) cleanPreviouslyGeneratedSources();
       executeWithAssertionGenerator(assertionGenerator);
+    } catch (MojoFailureException e) {
+      throw e;
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage(), e);
     }
@@ -249,7 +257,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   }
 
   @VisibleForTesting
-  AssertionsGeneratorReport executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) {
+  AssertionsGeneratorReport executeWithAssertionGenerator(AssertionsGenerator assertionGenerator) throws MojoFailureException {
     if (classes == null) classes = new String[0];
     AssertionsGeneratorReport generatorReport = assertionGenerator.generateAssertionsFor(packages, classes, targetDir,
                                                                                          entryPointClassPackage, hierarchical,
@@ -258,6 +266,17 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
     if (isEmpty(generatedSourcesScope) || equalsIgnoreCase("test", generatedSourcesScope)) project.addTestCompileSourceRoot(targetDir);
     else if (equalsIgnoreCase("compile", generatedSourcesScope)) project.addCompileSourceRoot(targetDir);
     else getLog().warn(format("Unknown generated sources scope '%s' - no sources added to project", generatedSourcesScope));
+
+    if (this.failOnError) {
+      if (!generatorReport.getInputClassesNotFound().isEmpty()) {
+        throw new MojoFailureException(format("Could not generate all assertion classes. %s input class(es) could not be found.",
+                                              generatorReport.getInputClassesNotFound().size()));
+      }
+      if (generatorReport.getReportedException() != null) {
+        throw new MojoFailureException("Could not generate all assertion classes, an exception occured.",
+                                       generatorReport.getReportedException());
+      }
+    }
     return generatorReport;
   }
 

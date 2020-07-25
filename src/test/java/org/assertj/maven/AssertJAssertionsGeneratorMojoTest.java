@@ -19,6 +19,7 @@ import static org.assertj.core.util.Arrays.array;
 import static org.assertj.core.util.Files.newFile;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.assertj.maven.AssertJAssertionsGeneratorMojo.shouldHaveNonEmptyPackagesOrClasses;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -514,6 +515,79 @@ public class AssertJAssertionsGeneratorMojoTest {
     assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
     // THEN
     assertThat(assertionsFileFor(PackagePrivate.class)).doesNotExist();
+  }
+
+  @Test
+  public void plugin_should_not_fail_build_if_input_class_not_found_and_fail_on_error_is_false() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.classes = array("this.class.does.not.exist");
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(PackagePrivate.class.getName()));
+    AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
+    // WHEN
+    AssertionsGeneratorReport report = assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
+    // THEN
+    assertThat(report.getInputClassesNotFound()).containsExactly("this.class.does.not.exist");
+  }
+
+  @Test
+  public void plugin_should_not_fail_build_if_exceptions_occurs_and_fail_on_error_is_false() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(Employee.class.getName()));
+    // let's throws an IOException when generating custom assertions
+    AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
+    BaseAssertionGenerator baseGenerator = mock(BaseAssertionGenerator.class);
+    generator.setBaseGenerator(baseGenerator);
+    when(baseGenerator.generateCustomAssertionFor(any(ClassDescription.class))).thenThrow(IOException.class);
+    // WHEN
+    AssertionsGeneratorReport report = assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
+    // THEN
+    assertThat(report.getInputClassesNotFound()).isEmpty();
+    assertThat(report.getReportedException()).isInstanceOf(IOException.class);
+  }
+
+  @Test
+  public void plugin_must_fail_build_if_input_class_not_found_and_fail_on_error_is_true() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.classes = array("this.class.does.not.exist");
+    assertjAssertionsGeneratorMojo.failOnError = true;
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(PackagePrivate.class.getName()));
+    AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
+    // WHEN
+    try {
+      assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
+    }
+    // THEN
+    catch(final Exception e) {
+      assertThat(e).isInstanceOf(MojoFailureException.class)
+                   .hasMessage("Could not generate all assertion classes. 1 input class(es) could not be found.");
+      return;
+    }
+    fail("Exception should have been thrown.");
+  }
+
+  @Test
+  public void plugin_must_fail_build_if_exceptions_occurs_and_fail_on_error_is_true() throws Exception {
+    // GIVEN
+    assertjAssertionsGeneratorMojo.classes = array("org.assertj.maven.test.Employee");
+    assertjAssertionsGeneratorMojo.failOnError = true;
+    when(mavenProject.getCompileClasspathElements()).thenReturn(newArrayList(Employee.class.getName()));
+    // let's throws an IOException when generating custom assertions
+    AssertionsGenerator generator = new AssertionsGenerator(Thread.currentThread().getContextClassLoader());
+    BaseAssertionGenerator baseGenerator = mock(BaseAssertionGenerator.class);
+    generator.setBaseGenerator(baseGenerator);
+    when(baseGenerator.generateCustomAssertionFor(any(ClassDescription.class))).thenThrow(IOException.class);
+    // WHEN
+    try {
+      assertjAssertionsGeneratorMojo.executeWithAssertionGenerator(generator);
+    }
+    // THEN
+    catch(final Exception e) {
+      assertThat(e).isInstanceOf(MojoFailureException.class)
+      .hasMessage("Could not generate all assertion classes, an exception occured.");
+      return;
+    }
+    fail("Exception should have been thrown.");
   }
 
   private File assertionsFileFor(Class<?> clazz) {
