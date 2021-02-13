@@ -163,6 +163,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   public boolean generateBddAssertions = true;
 
   /**
+   * Generate generating BDD Soft Assertions entry point class.
+   */
+  @Parameter(property = "assertj.generate.BddSoftAssertions")
+  public boolean generateBddSoftAssertions = true;
+
+  /**
    * Generate generating JUnit Soft Assertions entry point class.
    */
   @Parameter(property = "assertj.generate.JUnitSoftAssertions")
@@ -213,6 +219,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
       assertionGenerator.setExcludePatterns(excludes);
       if (generateAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(STANDARD);
       if (generateBddAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(BDD);
+      if (generateBddSoftAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(BDD_SOFT);
       if (generateSoftAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(SOFT);
       if (generateJUnitSoftAssertions) {
         if (junitFoundBy(projectClassLoader)) assertionGenerator.enableEntryPointClassesGenerationFor(JUNIT_SOFT);
