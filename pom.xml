@@ -30,7 +30,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.2</version>
+        <version>3.6.1</version>
         <configuration>
           <goalPrefix>assertj</goalPrefix>
           <!-- see http://jira.codehaus.org/browse/MNG-5346 -->
