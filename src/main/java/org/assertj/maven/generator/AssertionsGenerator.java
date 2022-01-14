@@ -30,6 +30,7 @@ import com.google.common.reflect.TypeToken;
 import org.apache.maven.plugin.logging.Log;
 import org.assertj.assertions.generator.AssertionsEntryPointType;
 import org.assertj.assertions.generator.BaseAssertionGenerator;
+import org.assertj.assertions.generator.GeneratedAnnotationSource;
 import org.assertj.assertions.generator.Template;
 import org.assertj.assertions.generator.description.ClassDescription;
 import org.assertj.assertions.generator.description.converter.ClassToClassDescriptionConverter;
@@ -202,5 +203,9 @@ public class AssertionsGenerator {
 
   public void setGeneratedAssertionsPackage(String generateAssertionsInPackage) {
     this.generator.setGeneratedAssertionsPackage(generateAssertionsInPackage);
+  }
+
+  public void setGeneratedAnnotationSource(GeneratedAnnotationSource generatedAnnotationSource) {
+    generator.setGeneratedAnnotationSource(generatedAnnotationSource);
   }
 }

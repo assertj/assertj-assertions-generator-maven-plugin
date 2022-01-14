@@ -41,6 +41,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.assertj.assertions.generator.GeneratedAnnotationSource;
 import org.assertj.core.util.VisibleForTesting;
 import org.assertj.maven.generator.AssertionsGenerator;
 import org.assertj.maven.generator.AssertionsGeneratorReport;
@@ -198,6 +199,12 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
   @Parameter(property = "assertj.includePackagePrivateClasses")
   public boolean includePackagePrivateClasses = false;
 
+  /**
+   * Where the @Generated annotation should come from. Options: JAVAX (default), JAKARTA, NONE.
+   */
+  @Parameter(property = "assertj.annotationSource")
+  public GeneratedAnnotationSource generatedAnnotationSource = GeneratedAnnotationSource.JAVAX;
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     if (skip) {
@@ -211,6 +218,7 @@ public class AssertJAssertionsGeneratorMojo extends AbstractMojo {
       assertionGenerator.generateAssertionsForAllFields(this.generateAssertionsForAllFields);
       assertionGenerator.setIncludePatterns(includes);
       assertionGenerator.setExcludePatterns(excludes);
+      assertionGenerator.setGeneratedAnnotationSource(generatedAnnotationSource);
       if (generateAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(STANDARD);
       if (generateBddAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(BDD);
       if (generateSoftAssertions) assertionGenerator.enableEntryPointClassesGenerationFor(SOFT);
