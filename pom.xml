@@ -68,6 +68,7 @@
           <excludes>
             <exclude>org/assertj/maven/HelpMojo.class</exclude>
             <exclude>org/assertj/maven/NoLog.class</exclude>
+            <exclude>org/assertj/assertj_assertions_generator_maven_plugin/HelpMojo.class</exclude>
           </excludes>
         </configuration>
       </plugin>
