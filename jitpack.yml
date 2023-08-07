@@ -1,0 +1,8 @@
+jdk:
+  - openjdk11
+
+before_install:
+  # Fix the group id
+  - find . -name "pom.xml" | xargs sed -i "s/<\/parent>/<\/parent><groupId>${GROUP}<\/groupId>/g"
+  # Fix the version
+  - mvn versions:set -DnewVersion=${VERSION}
